@@ -1,0 +1,14 @@
+server:
+    port: 8080
+    host: localhost
+    request_limit: 100
+
+database:
+    type: postgresql
+    connection:
+        host: localhost
+        port: "5432"
+        user: admin
+        password: admin
+        dbname: tianyi
+        sslmode: disable
