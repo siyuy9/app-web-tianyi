@@ -8,6 +8,6 @@ import (
 
 func runnersGetHandler(context *fiber.Ctx) error {
 	runners := []db.GitlabRunner{}
-	common.App.DB.Find(&runners)
+	common.App.Database.Find(&runners)
 	return context.Status(fiber.StatusOK).JSON(runners)
 }

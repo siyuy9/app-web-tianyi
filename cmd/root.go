@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 kongrentian
-
-*/
 package cmd
 
 import (

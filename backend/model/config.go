@@ -1,16 +1,58 @@
+// snake_case keys in nested structs does not work if you use `json`,
+// you need to use `mapstructure`
+// https://github.com/spf13/viper/issues/125
 package model
 
 import (
 	"log"
 	"os"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 type ConfigType struct {
-	Server   *ServerType   `json:"server"`
-	Database *DatabaseType `json:"database"`
+	Server   *ServerType   `mapstructure:"server"`
+	Database *DatabaseType `mapstructure:"database"`
+}
+
+type ServerType struct {
+	Port string `mapstructure:"port"`
+	Host string `mapstructure:"host"`
+	// Max number of recent connections during `Expiration` seconds (1 minute)
+	// before sending a 429 response
+	RequestLimit int           `mapstructure:"request_limit"`
+	Fiber        *fiber.Config `mapstructure:"fiber"`
+}
+
+type DatabaseType struct {
+	// https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL
+	Connection map[string]string `mapstructure:"connection"`
+	Type       DatabaseConstType `mapstructure:"type"`
+}
+
+func NewServer() *ServerType {
+	return &ServerType{
+		Host:         "localhost",
+		Port:         "8080",
+		RequestLimit: 100,
+		Fiber:        &fiber.Config{},
+	}
+}
+
+func NewDatabase() *DatabaseType {
+	return &DatabaseType{
+		Type: PostgresqlConst,
+		Connection: map[string]string{
+			"host":     "localhost",
+			"port":     "9920",
+			"user":     "admin",
+			"password": "admin",
+			"dbname":   "tianyi",
+			"sslmode":  "disable",
+		},
+	}
 }
 
 func NewConfigType() *ConfigType {
@@ -51,7 +93,7 @@ func (config *ConfigType) ReadFromEnvironment() {
 		log.Println("Error initializing config file:", err)
 		return
 	}
-	err = viper.Unmarshal(config)
+	err = viper.UnmarshalExact(config)
 	if err == nil {
 		log.Println("Using config file:", viper.ConfigFileUsed())
 		return
@@ -60,41 +102,12 @@ func (config *ConfigType) ReadFromEnvironment() {
 		"Could not unmarshal config file %s: %s",
 		viper.ConfigFileUsed(),
 		err)
-	return
 }
 
-type ServerType struct {
-	Port string `json:"port"`
-	Host string `json:"host"`
-	// Max number of recent connections during `Expiration` seconds (1 minute)
-	// before sending a 429 response
-	RequestLimit int `json:"request_limit"`
-}
-
-func NewServer() *ServerType {
-	return &ServerType{
-		Host:         "localhost",
-		Port:         "8080",
-		RequestLimit: 100,
-	}
-}
-
-type DatabaseType struct {
-	// https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL
-	Connection map[string]string `json:"connection"`
-	Type       DatabaseConstType `json:"type"`
-}
-
-func NewDatabase() *DatabaseType {
-	return &DatabaseType{
-		Type: PostgresqlConst,
-		Connection: map[string]string{
-			"host":     "localhost",
-			"port":     "9920",
-			"user":     "admin",
-			"password": "admin",
-			"dbname":   "tianyi",
-			"sslmode":  "disable",
-		},
-	}
+// Config is a struct holding the server settings.
+type Config struct {
+	// Enables the "Server: value" HTTP header.
+	//
+	// Default: ""
+	ServerHeader string `mapstructure:"server_header"`
 }

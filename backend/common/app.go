@@ -7,7 +7,6 @@ import (
 	"github.com/gofiber/storage/memory"
 	"gitlab.com/kongrentian-groups/golang/tianyi/backend/db"
 	"gitlab.com/kongrentian-groups/golang/tianyi/backend/model"
-	"gorm.io/gorm"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,27 +16,30 @@ var App *AppType = newApp()
 type AppType struct {
 	// app config
 	Config *model.ConfigType
-	// database
-	DB *gorm.DB
-	// fiber instance
+	// database, useless until Database.Connect() is called
+	Database *db.DatabaseService
+	// fiber instance, nil until App.InitializeServer is called
 	Fiber *fiber.App
-	// session store
+	// session store, nil until App.InitializeServer is called
 	Sessions *session.Store
 }
 
 func newApp() *AppType {
 	config := model.NewConfigType()
 	return &AppType{
-		Config: config,
-		DB:     db.ConnectDatabase(config),
-		Fiber: fiber.New(fiber.Config{
-			ServerHeader: "tianyi",
-			AppName:      "tianyi",
-		}),
-		Sessions: session.New(session.Config{
-			Storage: memory.New(memory.Config{
-				GCInterval: 24 * time.Hour,
-			}),
-		}),
+		Config:   config,
+		Database: db.NewDatabaseService(config.Database),
+		Fiber:    nil,
+		Sessions: nil,
 	}
+}
+
+func (app *AppType) InitializeServer() {
+	app.Database.Connect()
+	app.Fiber = fiber.New(*app.Config.Server.Fiber)
+	app.Sessions = session.New(session.Config{
+		Storage: memory.New(memory.Config{
+			GCInterval: 24 * time.Hour,
+		}),
+	})
 }

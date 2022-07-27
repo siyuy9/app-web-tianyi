@@ -2,13 +2,22 @@ package frontend
 
 import (
 	"embed"
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
-//go:embed dist/static
-var Static embed.FS
+var (
+	DistHandler func(context *fiber.Ctx) error
+	//go:embed dist
+	dist embed.FS
+)
 
-//go:embed dist/index.html
-var Index embed.FS
-
-//go:embed dist/favicon.ico
-var Favicon embed.FS
+func init() {
+	DistHandler = filesystem.New(filesystem.Config{
+		Root:         http.FS(dist),
+		PathPrefix:   "dist",
+		NotFoundFile: "dist/index.html",
+	})
+}

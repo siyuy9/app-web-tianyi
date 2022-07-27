@@ -9,11 +9,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"gitlab.com/kongrentian-groups/golang/tianyi/backend/api"
 	"gitlab.com/kongrentian-groups/golang/tianyi/backend/common"
 )
 
 func Start() {
+	common.App.InitializeServer()
+
 	// use global middlewares
 	// https://docs.gofiber.io/api/middleware
 	common.App.Fiber.Use(
@@ -23,9 +24,10 @@ func Start() {
 		csrf.New(),
 		recover.New(),
 		logger.New(),
+		// limiter.New(),
 	)
 	// setup routes
-	api.SetRoutes(common.App.Fiber)
+	setRoutes(common.App.Fiber)
 
 	// listen
 	err := common.App.Fiber.Listen(
