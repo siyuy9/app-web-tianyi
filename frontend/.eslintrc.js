@@ -7,7 +7,7 @@ module.exports = {
   extends: [
     "plugin:vue/vue3-essential",
     "eslint:recommended",
-    "plugin:prettier/recommended",
+    "prettier",
     "eslint-config-prettier",
   ],
   parserOptions: {
@@ -16,7 +16,6 @@ module.exports = {
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-    // temporary, untill all boilerplate is removed
     "vue/multi-word-component-names": "off",
   },
 };

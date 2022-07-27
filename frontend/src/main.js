@@ -96,6 +96,7 @@ import TriStateCheckbox from "primevue/tristatecheckbox";
 
 import CodeHighlight from "./AppCodeHighlight";
 import BlockViewer from "./BlockViewer";
+import AppInputStyleSwitch from "./AppInputStyleSwitch";
 
 router.beforeEach(function (to, from, next) {
   window.scrollTo(0, 0);
@@ -198,6 +199,7 @@ app.component("Tree", Tree);
 app.component("TreeSelect", TreeSelect);
 app.component("TreeTable", TreeTable);
 app.component("TriStateCheckbox", TriStateCheckbox);
+app.component("AppInputStyleSwitch", AppInputStyleSwitch);
 
 app.component("BlockViewer", BlockViewer);
 

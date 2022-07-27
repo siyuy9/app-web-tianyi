@@ -90,12 +90,6 @@ export default {
               to: "/blocks",
               badge: "NEW",
             },
-            {
-              label: "All Blocks",
-              icon: "pi pi-fw pi-globe",
-              url: "https://www.primefaces.org/primeblocks-vue",
-              target: "_blank",
-            },
           ],
         },
         {
@@ -128,7 +122,11 @@ export default {
               icon: "pi pi-fw pi-exclamation-circle",
               to: "/notfound",
             },
-            { label: "Access Denied", icon: "pi pi-fw pi-lock", to: "/access" },
+            {
+              label: "Access Denied",
+              icon: "pi pi-fw pi-lock",
+              to: "/access",
+            },
             { label: "Empty", icon: "pi pi-fw pi-circle-off", to: "/empty" },
           ],
         },

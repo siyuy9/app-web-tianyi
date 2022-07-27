@@ -3,9 +3,7 @@
 ## logo
 
 ![black logo](./frontend/public/images/logo-dark.svg)
-<img src="./frontend/public/images/logo-dark.svg">
 ![white logo](./frontend/public/images/logo-white.svg)
-<img src="./frontend/public/images/logo-white.svg">
 
 the logo is made with [`google-font-to-svg-path`](https://danmarshall.github.io/google-font-to-svg-path/)
 using font
@@ -13,11 +11,14 @@ using font
 
 ## frontend
 
-`vuejs` SPA
+[`vuejs`](https://vuejs.org/) SPA using
+[`primevue`](https://www.primefaces.org/primevue/)
 
 ### theme
 
-modified [`sakai-vue` theme](https://github.com/primefaces/sakai-vue) theme (MIT license)
+modified [`sakai-vue` theme](https://github.com/primefaces/sakai-vue) theme
+with pieces from
+[primevue official website](https://github.com/primefaces/primevue)
 
 [`sakai-vue` demo](https://www.primefaces.org/sakai-vue/)
 

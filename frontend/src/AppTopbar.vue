@@ -6,7 +6,7 @@
     </router-link>
     <button
       class="p-link layout-menu-button layout-topbar-button"
-      @click="onMenuToggle"
+      @click="onMenuToggle($event)"
     >
       <i class="pi pi-bars"></i>
     </button>
@@ -32,10 +32,15 @@
         </button>
       </li>
       <li>
-        <button class="p-link layout-topbar-button">
+        <a
+          href="#"
+          class="p-link layout-topbar-button layout-config-button"
+          id="layout-config-button"
+          @click="toggleConfigurator"
+        >
           <i class="pi pi-cog"></i>
           <span>Settings</span>
-        </button>
+        </a>
       </li>
       <li>
         <button class="p-link layout-topbar-button">
@@ -48,8 +53,13 @@
 </template>
 
 <script>
+import EventBus from "./AppEventBus";
+
 export default {
   methods: {
+    toggleConfigurator(event) {
+      EventBus.emit("configurator-toggle", event);
+    },
     onMenuToggle(event) {
       this.$emit("menu-toggle", event);
     },

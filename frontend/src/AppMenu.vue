@@ -7,9 +7,6 @@
       @menuitem-click="onMenuItemClick"
       @keydown="onKeyDown"
     />
-    <a href="https://www.primefaces.org/primeblocks-vue" class="block mt-3">
-      <img alt="primeblocks" :src="bannerImage()" class="w-full" />
-    </a>
   </div>
 </template>
 
@@ -30,11 +27,6 @@ export default {
         nodeElement.click();
         event.preventDefault();
       }
-    },
-    bannerImage() {
-      return this.$appState.darkTheme
-        ? "images/banner-primeblocks-dark.png"
-        : "images/banner-primeblocks.png";
     },
   },
   computed: {
