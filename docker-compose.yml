@@ -1,18 +1,28 @@
 version: "3.1"
 
 services:
-    postgres:
-        container_name: tianyi_postgres
-        image: postgres:alpine
-        restart: always
-        environment:
-            POSTGRES_DB: tianyi
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-        networks:
-            - tianyi
-        ports:
-            - "5432:5432"
+  postgres:
+    container_name: tianyi_postgres
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_DB: tianyi
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
+    networks:
+      - tianyi
+    ports:
+      - "5432:5432"
+
+  redis:
+    container_name: tianyi_redis
+    image: redis:alpine
+    restart: always
+    networks:
+      - tianyi
+    command: redis-server --requirepass "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
+    ports:
+      - "6379:6379"
 
 networks:
-    tianyi:
+  tianyi:

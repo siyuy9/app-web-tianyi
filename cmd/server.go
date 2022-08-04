@@ -11,11 +11,10 @@ var serverCmd = &cobra.Command{
 	Short: "run in server mode",
 	Long:  `description`,
 	Run: func(cmd *cobra.Command, args []string) {
-		backend.Start()
+		backend.Run()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
-	cobra.OnInitialize(backend.Start)
 }

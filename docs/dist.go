@@ -1,4 +1,4 @@
-package frontend
+package docs
 
 import (
 	"embed"
@@ -9,16 +9,15 @@ import (
 )
 
 var (
+	// returns swagger.json or swagger.yaml
 	DistHandler func(context *fiber.Ctx) error
-	// embeds directory into the variable on initialization
-	//go:embed dist
+	// embeds files into the variable on initialization
+	//go:embed swagger.*
 	dist embed.FS
 )
 
 func init() {
 	DistHandler = filesystem.New(filesystem.Config{
-		Root:         http.FS(dist),
-		PathPrefix:   "dist",
-		NotFoundFile: "dist/index.html",
+		Root: http.FS(dist),
 	})
 }

@@ -37,7 +37,7 @@
             @update:modelValue="onRippleChange"
           />
 
-          <h5>Menu Type</h5>
+          <h4>Menu Type</h4>
           <div class="p-formgroup-inline">
             <div class="field-radiobutton">
               <RadioButton
@@ -61,6 +61,7 @@
             </div>
           </div>
 
+          <h4>Themes</h4>
           <h5>Bootstrap</h5>
           <div class="grid free-themes">
             <div class="col-3">
@@ -70,7 +71,7 @@
                 @click="changeTheme($event, 'bootstrap4-light-blue')"
               >
                 <img
-                  src="images/themes/bootstrap4-light-blue.svg"
+                  src="/images/themes/bootstrap4-light-blue.svg"
                   alt="Bootstrap Light Blue"
                 />
               </button>
@@ -83,7 +84,7 @@
                 @click="changeTheme($event, 'bootstrap4-light-purple')"
               >
                 <img
-                  src="images/themes/bootstrap4-light-purple.svg"
+                  src="/images/themes/bootstrap4-light-purple.svg"
                   alt="Bootstrap Light Blue"
                 />
               </button>
@@ -96,7 +97,7 @@
                 @click="changeTheme($event, 'bootstrap4-dark-blue', true)"
               >
                 <img
-                  src="images/themes/bootstrap4-dark-blue.svg"
+                  src="/images/themes/bootstrap4-dark-blue.svg"
                   alt="Bootstrap Dark Blue"
                 />
               </button>
@@ -109,7 +110,7 @@
                 @click="changeTheme($event, 'bootstrap4-dark-purple', true)"
               >
                 <img
-                  src="images/themes/bootstrap4-dark-purple.svg"
+                  src="/images/themes/bootstrap4-dark-purple.svg"
                   alt="Bootstrap Dark Blue"
                 />
               </button>
@@ -126,7 +127,7 @@
                 @click="changeTheme($event, 'md-light-indigo')"
               >
                 <img
-                  src="images/themes/md-light-indigo.svg"
+                  src="/images/themes/md-light-indigo.svg"
                   alt="Material Light Indigo"
                 />
               </button>
@@ -139,7 +140,7 @@
                 @click="changeTheme($event, 'md-light-deeppurple')"
               >
                 <img
-                  src="images/themes/md-light-deeppurple.svg"
+                  src="/images/themes/md-light-deeppurple.svg"
                   alt="Material Light Deep Purple"
                 />
               </button>
@@ -152,7 +153,7 @@
                 @click="changeTheme($event, 'md-dark-indigo', true)"
               >
                 <img
-                  src="images/themes/md-dark-indigo.svg"
+                  src="/images/themes/md-dark-indigo.svg"
                   alt="Material Dark Indigo"
                 />
               </button>
@@ -165,7 +166,7 @@
                 @click="changeTheme($event, 'md-dark-deeppurple', true)"
               >
                 <img
-                  src="images/themes/md-dark-deeppurple.svg"
+                  src="/images/themes/md-dark-deeppurple.svg"
                   alt="Material Dark Deep Purple"
                 />
               </button>
@@ -182,7 +183,7 @@
                 @click="changeTheme($event, 'mdc-light-indigo')"
               >
                 <img
-                  src="images/themes/md-light-indigo.svg"
+                  src="/images/themes/md-light-indigo.svg"
                   alt="Material Compact Light Indigo"
                 />
               </button>
@@ -195,7 +196,7 @@
                 @click="changeTheme($event, 'mdc-light-deeppurple')"
               >
                 <img
-                  src="images/themes/md-light-deeppurple.svg"
+                  src="/images/themes/md-light-deeppurple.svg"
                   alt="Material Compact Deep Purple"
                 />
               </button>
@@ -208,7 +209,7 @@
                 @click="changeTheme($event, 'mdc-dark-indigo', true)"
               >
                 <img
-                  src="images/themes/md-dark-indigo.svg"
+                  src="/images/themes/md-dark-indigo.svg"
                   alt="Material Compact Dark Indigo"
                 />
               </button>
@@ -221,7 +222,7 @@
                 @click="changeTheme($event, 'mdc-dark-deeppurple', true)"
               >
                 <img
-                  src="images/themes/md-dark-deeppurple.svg"
+                  src="/images/themes/md-dark-deeppurple.svg"
                   alt="Material Compact Dark Deep Purple"
                 />
               </button>
@@ -238,7 +239,7 @@
                 @click="changeTheme($event, 'tailwind-light')"
               >
                 <img
-                  src="images/themes/tailwind-light.png"
+                  src="/images/themes/tailwind-light.png"
                   alt="Tailwind Light"
                 />
               </button>
@@ -254,7 +255,10 @@
                 type="button"
                 @click="changeTheme($event, 'fluent-light')"
               >
-                <img src="images/themes/fluent-light.png" alt="Fluent Light" />
+                <img
+                  src="/images/themes/fluent-light.png"
+                  alt="Fluent Light"
+                />
               </button>
               <span>Fluent Light</span>
             </div>
@@ -272,7 +276,7 @@
                 @click="changeTheme($event, 'lara-light-indigo')"
               >
                 <img
-                  src="images/themes/lara-light-indigo.png"
+                  src="/images/themes/lara-light-indigo.png"
                   alt="Lara Light Indigo"
                 />
               </button>
@@ -285,7 +289,7 @@
                 @click="changeTheme($event, 'lara-light-blue')"
               >
                 <img
-                  src="images/themes/lara-light-blue.png"
+                  src="/images/themes/lara-light-blue.png"
                   alt="Lara Light Blue"
                 />
               </button>
@@ -298,7 +302,7 @@
                 @click="changeTheme($event, 'lara-light-purple')"
               >
                 <img
-                  src="images/themes/lara-light-purple.png"
+                  src="/images/themes/lara-light-purple.png"
                   alt="Lara Light Purple"
                 />
               </button>
@@ -311,7 +315,7 @@
                 @click="changeTheme($event, 'lara-light-teal')"
               >
                 <img
-                  src="images/themes/lara-light-teal.png"
+                  src="/images/themes/lara-light-teal.png"
                   alt="Lara Light Teal"
                 />
               </button>
@@ -324,7 +328,7 @@
                 @click="changeTheme($event, 'lara-dark-indigo', true)"
               >
                 <img
-                  src="images/themes/lara-dark-indigo.png"
+                  src="/images/themes/lara-dark-indigo.png"
                   alt="Lara Dark Indigo"
                 />
               </button>
@@ -337,7 +341,7 @@
                 @click="changeTheme($event, 'lara-dark-blue', true)"
               >
                 <img
-                  src="images/themes/lara-dark-blue.png"
+                  src="/images/themes/lara-dark-blue.png"
                   alt="Lara Dark Blue"
                 />
               </button>
@@ -350,7 +354,7 @@
                 @click="changeTheme($event, 'lara-dark-purple', true)"
               >
                 <img
-                  src="images/themes/lara-dark-purple.png"
+                  src="/images/themes/lara-dark-purple.png"
                   alt="Lara Dark Purple"
                 />
               </button>
@@ -363,7 +367,7 @@
                 @click="changeTheme($event, 'lara-dark-teal', true)"
               >
                 <img
-                  src="images/themes/lara-dark-teal.png"
+                  src="/images/themes/lara-dark-teal.png"
                   alt="Lara Dark Teal"
                 />
               </button>
@@ -379,7 +383,7 @@
                 type="button"
                 @click="changeTheme($event, 'saga-blue')"
               >
-                <img src="images/themes/saga-blue.png" alt="Saga Blue" />
+                <img src="/images/themes/saga-blue.png" alt="Saga Blue" />
               </button>
               <span>Saga Blue</span>
             </div>
@@ -389,7 +393,7 @@
                 type="button"
                 @click="changeTheme($event, 'saga-green')"
               >
-                <img src="images/themes/saga-green.png" alt="Saga Green" />
+                <img src="/images/themes/saga-green.png" alt="Saga Green" />
               </button>
               <span>Saga Green</span>
             </div>
@@ -399,7 +403,7 @@
                 type="button"
                 @click="changeTheme($event, 'saga-orange')"
               >
-                <img src="images/themes/saga-orange.png" alt="Saga Orange" />
+                <img src="/images/themes/saga-orange.png" alt="Saga Orange" />
               </button>
               <span>Saga Orange</span>
             </div>
@@ -409,7 +413,7 @@
                 type="button"
                 @click="changeTheme($event, 'saga-purple')"
               >
-                <img src="images/themes/saga-purple.png" alt="Saga Purple" />
+                <img src="/images/themes/saga-purple.png" alt="Saga Purple" />
               </button>
               <span>Saga Purple</span>
             </div>
@@ -419,7 +423,7 @@
                 type="button"
                 @click="changeTheme($event, 'vela-blue', true)"
               >
-                <img src="images/themes/vela-blue.png" alt="Vela Blue" />
+                <img src="/images/themes/vela-blue.png" alt="Vela Blue" />
               </button>
               <span>Vela Blue</span>
             </div>
@@ -429,7 +433,7 @@
                 type="button"
                 @click="changeTheme($event, 'vela-green', true)"
               >
-                <img src="images/themes/vela-green.png" alt="Vela Green" />
+                <img src="/images/themes/vela-green.png" alt="Vela Green" />
               </button>
               <span>Vela Green</span>
             </div>
@@ -439,7 +443,7 @@
                 type="button"
                 @click="changeTheme($event, 'vela-orange', true)"
               >
-                <img src="images/themes/vela-orange.png" alt="Vela Orange" />
+                <img src="/images/themes/vela-orange.png" alt="Vela Orange" />
               </button>
               <span>Vela Orange</span>
             </div>
@@ -449,7 +453,7 @@
                 type="button"
                 @click="changeTheme($event, 'vela-purple', true)"
               >
-                <img src="images/themes/vela-purple.png" alt="Vela Purple" />
+                <img src="/images/themes/vela-purple.png" alt="Vela Purple" />
               </button>
               <span>Vela Purple</span>
             </div>
@@ -459,7 +463,7 @@
                 type="button"
                 @click="changeTheme($event, 'arya-blue', true)"
               >
-                <img src="images/themes/arya-blue.png" alt="Arya Blue" />
+                <img src="/images/themes/arya-blue.png" alt="Arya Blue" />
               </button>
               <span>Arya Blue</span>
             </div>
@@ -469,7 +473,7 @@
                 type="button"
                 @click="changeTheme($event, 'arya-green', true)"
               >
-                <img src="images/themes/arya-green.png" alt="Arya Green" />
+                <img src="/images/themes/arya-green.png" alt="Arya Green" />
               </button>
               <span>Arya Green</span>
             </div>
@@ -479,7 +483,7 @@
                 type="button"
                 @click="changeTheme($event, 'arya-orange', true)"
               >
-                <img src="images/themes/arya-orange.png" alt="Arya Orange" />
+                <img src="/images/themes/arya-orange.png" alt="Arya Orange" />
               </button>
               <span>Arya Orange</span>
             </div>
@@ -489,7 +493,7 @@
                 type="button"
                 @click="changeTheme($event, 'arya-purple', true)"
               >
-                <img src="images/themes/arya-purple.png" alt="Arya Purple" />
+                <img src="/images/themes/arya-purple.png" alt="Arya Purple" />
               </button>
               <span>Arya Purple</span>
             </div>
@@ -547,9 +551,8 @@ export default {
       this.active = !this.active;
       event.preventDefault();
 
-      console.log("state", this.active);
-      //if (this.active) this.bindOutsideClickListener();
-      //else this.unbindOutsideClickListener();
+      if (this.active) this.bindOutsideClickListener();
+      else this.unbindOutsideClickListener();
     },
     hideConfigurator(event) {
       this.active = false;
@@ -602,7 +605,6 @@ export default {
   },
   computed: {
     containerClass() {
-      console.log(this.active);
       return ["layout-config", { "layout-config-active": this.active }];
     },
     rippleActive() {

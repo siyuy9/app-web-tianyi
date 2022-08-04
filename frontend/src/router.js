@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
-import App from "./App.vue";
+import AppProjects from "./AppProjects.vue";
+import AppAdmin from "./AppAdmin.vue";
 
 const routes = [
   {
     path: "/",
-    name: "app",
-    component: App,
+    name: "root",
+    redirect: { name: "projects" },
+  },
+  {
+    path: "/pages/projects",
+    name: "projects",
+    component: AppProjects,
     children: [
       {
         path: "",
@@ -139,12 +145,34 @@ const routes = [
         name: "icons",
         component: () => import("./components/IconsDemo.vue"),
       },
+      {
+        path: "/pages/invalid/access_denied",
+        name: "access",
+        component: () => import("./pages/invalid/AccessDenied.vue"),
+      },
     ],
   },
   {
-    path: "/login",
+    path: "/pages/admin",
+    name: "admin",
+    component: AppAdmin,
+    children: [
+      {
+        path: "/pages/admin/swagger",
+        name: "swagger",
+        component: () => import("./pages/admin/Swagger.vue"),
+      },
+    ],
+  },
+  {
+    path: "/pages/auth/login",
     name: "login",
-    component: () => import("./pages/Login.vue"),
+    component: () => import("./pages/auth/LoginPage.vue"),
+  },
+  {
+    path: "/pages/auth/registration",
+    name: "registration",
+    component: () => import("./pages/auth/RegistrationPage.vue"),
   },
   {
     path: "/landing",
@@ -152,19 +180,16 @@ const routes = [
     component: () => import("./pages/LandingDemo.vue"),
   },
   {
-    path: "/error",
+    path: "/pages/invalid/error",
     name: "error",
-    component: () => import("./pages/Error.vue"),
+    component: () => import("./pages/invalid/ErrorPage.vue"),
   },
   {
-    path: "/notfound",
-    name: "notfound",
-    component: () => import("./pages/NotFound.vue"),
-  },
-  {
-    path: "/access",
-    name: "access",
-    component: () => import("./pages/Access.vue"),
+    // catch all
+    // https://stackoverflow.com/a/40194152
+    path: "/:pathMatch(.*)*",
+    name: "not_found",
+    component: () => import("./pages/invalid/NotFound.vue"),
   },
 ];
 

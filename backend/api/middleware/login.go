@@ -9,7 +9,7 @@ func requireLogin(
 	context *fiber.Ctx,
 	unauthorized func(context *fiber.Ctx) error,
 ) error {
-	currentSession, err := common.App.Sessions.Get(context)
+	currentSession, err := common.App.SessionStore.Get(context)
 	if err != nil {
 		return err
 	}

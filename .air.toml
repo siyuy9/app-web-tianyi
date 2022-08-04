@@ -8,16 +8,16 @@ tmp_dir = "target"
 [build]
 # Just plain old shell command. You could use `make` as well.
 # NODE_OPTIONS are for https://github.com/webpack/webpack/issues/14532
-cmd = "cd frontend && yarn build && cd ../ && go build -o target/tianyi"
+cmd = "swag init -g run.go -d backend && cd frontend && yarn build && cd ../ && go build -o target/tianyi"
 # Binary file yields from `cmd`.
 bin = "target/tianyi server"
 # Customize binary, can setup environment variables when run your app.
 #full_bin = "APP_ENV=dev APP_USER=air ./tmp/main"
 # Watch these filename extensions.
-include_ext = ["go", "tpl", "tmpl", "html", "js", "yml", "vue", "toml", "scss", "svg"]
+include_ext = ["go", "tpl", "html", "js", "yml", "vue", "toml", "scss", "svg"]
 # Ignore these filename extensions or directories.
 exclude_dir = [
-    "assets", "target", "vendor",
+    "assets", "target", "vendor", "docs",
     "frontend/node_modules", "frontend/dist"]
 # Watch these directories if you specified.
 include_dir = []

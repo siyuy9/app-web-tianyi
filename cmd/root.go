@@ -40,5 +40,5 @@ func init() {
 		"config path",
 	)
 	viper.BindPFlag("config", rootCmd.Flags().Lookup("config"))
-	cobra.OnInitialize(common.App.Config.ReadFromEnvironment)
+	cobra.OnInitialize(common.App.FillConfigFromEnvironment)
 }

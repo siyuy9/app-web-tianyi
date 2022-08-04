@@ -1,4 +1,4 @@
-package v4
+package v1
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -7,7 +7,7 @@ import (
 )
 
 func runnersGetHandler(context *fiber.Ctx) error {
-	runners := []db.GitlabRunner{}
-	common.App.Database.Find(&runners)
+	runners := []db.GitlabRunnerModel{}
+	common.App.GitlabRunnerStore.Find(&runners)
 	return context.Status(fiber.StatusOK).JSON(runners)
 }

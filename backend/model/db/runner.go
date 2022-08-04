@@ -6,7 +6,7 @@ import (
 )
 
 // https://gitlab.com/gitlab-org/gitlab/-/blob/master/db/structure.sql#L13130
-type GitlabRunner struct {
+type GitlabRunnerModel struct {
 	gorm.Model
 	Token        string `json:"token,omitempty"`
 	Name         string `json:"name,omitempty"`

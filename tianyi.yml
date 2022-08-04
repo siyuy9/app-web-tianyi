@@ -3,19 +3,27 @@ server:
     host: localhost
     request_limit: 100
 
-    # https://github.com/gofiber/fiber/blob/master/app.go#L128
-    # keys should not be snake_case
-    # (`json` annotations in nested structs are not handled properly by viper)
-    fiber:
-        ServerHeader: tianyi
-        AppName: tianyi
-
 database:
     type: postgresql
     connection:
-        host: localhost
+        host: kongrentian.com
         port: 5432
-        user: postgres
-        password: postgres
+        user: admin
+        password: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
         dbname: tianyi
         sslmode: disable
+
+redis:
+    host: kongrentian.com
+    port: 6379
+    password: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
+    database: 0
+    reset: false
+
+# https://docs.gofiber.io/api/fiber#config
+# https://github.com/gofiber/fiber/blob/master/app.go#L128
+# all snake_case names should be written without '_'
+# (`json` annotations in nested structs are not handled properly by viper)
+fiber:
+    serverheader: tianyi
+    AppName: tianyi

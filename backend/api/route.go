@@ -5,23 +5,24 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	v1 "gitlab.com/kongrentian-groups/golang/tianyi/backend/api/route/v1"
-	v4 "gitlab.com/kongrentian-groups/golang/tianyi/backend/api/route/v4"
+	"gitlab.com/kongrentian-groups/golang/tianyi/backend/common"
 )
 
-func SetRoutes(api fiber.Router) {
+func SetupRoutes(api fiber.Router) {
+	// api routes
 	v1.SetRoutes(api.Group("/v1"))
-	v4.SetRoutes(api.Group("/v4"))
-	api.All("/", MissingRouteHandler)
+	// redirect for requests from gitlab-runners
+	api.Use("/v4", func(context *fiber.Ctx) error {
+		return context.Redirect("/v1")
+	})
+	// catch all so you don't get html files on invalid api requests
+	api.Use(MissingRouteHandler)
 }
 
 func MissingRouteHandler(context *fiber.Ctx) error {
-	errorMessage := fmt.Sprintf(
+	return common.BadRequest(context, fiber.StatusBadRequest, fmt.Sprintf(
 		"Route '%s %s' does not exist",
 		context.Method(),
 		context.OriginalURL(),
-	)
-	return context.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-		"status":  "fail",
-		"message": errorMessage,
-	})
+	))
 }

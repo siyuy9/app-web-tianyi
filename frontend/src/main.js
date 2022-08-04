@@ -89,14 +89,16 @@ import TabView from "primevue/tabview";
 import TabPanel from "primevue/tabpanel";
 import Tooltip from "primevue/tooltip";
 import ToggleButton from "primevue/togglebutton";
-import Tree from "primevue/tree";
 import TreeSelect from "primevue/treeselect";
 import TreeTable from "primevue/treetable";
+import Tree from "primevue/tree";
 import TriStateCheckbox from "primevue/tristatecheckbox";
 
 import CodeHighlight from "./AppCodeHighlight";
 import BlockViewer from "./BlockViewer";
 import AppInputStyleSwitch from "./AppInputStyleSwitch";
+import FormPage from "./pages/common/FormPage.vue";
+import InvalidPage from "./pages/common/InvalidPage.vue";
 
 router.beforeEach(function (to, from, next) {
   window.scrollTo(0, 0);
@@ -115,92 +117,111 @@ app.use(ConfirmationService);
 app.use(ToastService);
 app.use(router);
 
-app.directive("tooltip", Tooltip);
-app.directive("ripple", Ripple);
-app.directive("code", CodeHighlight);
-app.directive("badge", BadgeDirective);
-app.directive("styleclass", StyleClass);
+const directives = {
+  tooltip: Tooltip,
+  ripple: Ripple,
+  code: CodeHighlight,
+  badge: BadgeDirective,
+  styleclass: StyleClass,
+};
 
-app.component("Accordion", Accordion);
-app.component("AccordionTab", AccordionTab);
-app.component("AutoComplete", AutoComplete);
-app.component("Avatar", Avatar);
-app.component("AvatarGroup", AvatarGroup);
-app.component("Badge", Badge);
-app.component("Breadcrumb", Breadcrumb);
-app.component("Button", Button);
-app.component("Calendar", Calendar);
-app.component("Card", Card);
-app.component("Carousel", Carousel);
-app.component("Chart", Chart);
-app.component("Checkbox", Checkbox);
-app.component("Chip", Chip);
-app.component("Chips", Chips);
-app.component("ColorPicker", ColorPicker);
-app.component("Column", Column);
-app.component("ConfirmDialog", ConfirmDialog);
-app.component("ConfirmPopup", ConfirmPopup);
-app.component("ContextMenu", ContextMenu);
-app.component("DataTable", DataTable);
-app.component("DataView", DataView);
-app.component("DataViewLayoutOptions", DataViewLayoutOptions);
-app.component("Dialog", Dialog);
-app.component("Divider", Divider);
-app.component("Dropdown", Dropdown);
-app.component("Fieldset", Fieldset);
-app.component("FileUpload", FileUpload);
-app.component("Image", Image);
-app.component("InlineMessage", InlineMessage);
-app.component("Inplace", Inplace);
-app.component("InputMask", InputMask);
-app.component("InputNumber", InputNumber);
-app.component("InputSwitch", InputSwitch);
-app.component("InputText", InputText);
-app.component("Galleria", Galleria);
-app.component("Knob", Knob);
-app.component("Listbox", Listbox);
-app.component("MegaMenu", MegaMenu);
-app.component("Menu", Menu);
-app.component("Menubar", Menubar);
-app.component("Message", Message);
-app.component("MultiSelect", MultiSelect);
-app.component("OrderList", OrderList);
-app.component("OrganizationChart", OrganizationChart);
-app.component("OverlayPanel", OverlayPanel);
-app.component("Paginator", Paginator);
-app.component("Panel", Panel);
-app.component("PanelMenu", PanelMenu);
-app.component("Password", Password);
-app.component("PickList", PickList);
-app.component("ProgressBar", ProgressBar);
-app.component("RadioButton", RadioButton);
-app.component("Rating", Rating);
-app.component("SelectButton", SelectButton);
-app.component("ScrollPanel", ScrollPanel);
-app.component("ScrollTop", ScrollTop);
-app.component("Slider", Slider);
-app.component("Sidebar", Sidebar);
-app.component("Skeleton", Skeleton);
-app.component("SplitButton", SplitButton);
-app.component("Splitter", Splitter);
-app.component("SplitterPanel", SplitterPanel);
-app.component("Steps", Steps);
-app.component("TabMenu", TabMenu);
-app.component("TabView", TabView);
-app.component("TabPanel", TabPanel);
-app.component("Tag", Tag);
-app.component("Textarea", Textarea);
-app.component("TieredMenu", TieredMenu);
-app.component("Timeline", Timeline);
-app.component("Toast", Toast);
-app.component("Toolbar", Toolbar);
-app.component("ToggleButton", ToggleButton);
-app.component("Tree", Tree);
-app.component("TreeSelect", TreeSelect);
-app.component("TreeTable", TreeTable);
-app.component("TriStateCheckbox", TriStateCheckbox);
-app.component("AppInputStyleSwitch", AppInputStyleSwitch);
+// you cannot just use dynamic imports here
+// if you do, webpack will create a small file for each import
+// it will take much longer to load all of them
+const components = {
+  Accordion: Accordion,
+  AccordionTab: AccordionTab,
+  AutoComplete: AutoComplete,
+  Avatar: Avatar,
+  AvatarGroup: AvatarGroup,
+  Badge: Badge,
+  Breadcrumb: Breadcrumb,
+  Button: Button,
+  Calendar: Calendar,
+  Card: Card,
+  Carousel: Carousel,
+  Chart: Chart,
+  Checkbox: Checkbox,
+  Chip: Chip,
+  Chips: Chips,
+  ColorPicker: ColorPicker,
+  Column: Column,
+  ConfirmDialog: ConfirmDialog,
+  ConfirmPopup: ConfirmPopup,
+  ContextMenu: ContextMenu,
+  DataTable: DataTable,
+  DataView: DataView,
+  DataViewLayoutOptions: DataViewLayoutOptions,
+  Dialog: Dialog,
+  Divider: Divider,
+  Dropdown: Dropdown,
+  Fieldset: Fieldset,
+  FileUpload: FileUpload,
+  Image: Image,
+  InlineMessage: InlineMessage,
+  Inplace: Inplace,
+  InputMask: InputMask,
+  InputNumber: InputNumber,
+  InputSwitch: InputSwitch,
+  InputText: InputText,
+  Galleria: Galleria,
+  Knob: Knob,
+  Listbox: Listbox,
+  MegaMenu: MegaMenu,
+  Menu: Menu,
+  Menubar: Menubar,
+  Message: Message,
+  MultiSelect: MultiSelect,
+  OrderList: OrderList,
+  OrganizationChart: OrganizationChart,
+  OverlayPanel: OverlayPanel,
+  Paginator: Paginator,
+  Panel: Panel,
+  PanelMenu: PanelMenu,
+  Password: Password,
+  PickList: PickList,
+  ProgressBar: ProgressBar,
+  RadioButton: RadioButton,
+  Rating: Rating,
+  SelectButton: SelectButton,
+  ScrollPanel: ScrollPanel,
+  ScrollTop: ScrollTop,
+  Slider: Slider,
+  Sidebar: Sidebar,
+  Skeleton: Skeleton,
+  SplitButton: SplitButton,
+  Splitter: Splitter,
+  SplitterPanel: SplitterPanel,
+  Steps: Steps,
+  TabMenu: TabMenu,
+  TabView: TabView,
+  TabPanel: TabPanel,
+  Tag: Tag,
+  Textarea: Textarea,
+  TieredMenu: TieredMenu,
+  Timeline: Timeline,
+  Toast: Toast,
+  Toolbar: Toolbar,
+  ToggleButton: ToggleButton,
+  Tree: Tree,
+  TreeSelect: TreeSelect,
+  TreeTable: TreeTable,
+  TriStateCheckbox: TriStateCheckbox,
+  //
+  // custom components
+  //
+  AppInputStyleSwitch: AppInputStyleSwitch,
+  BlockViewer: BlockViewer,
+  FormPage: FormPage,
+  InvalidPage: InvalidPage,
+};
 
-app.component("BlockViewer", BlockViewer);
+for (const [key, value] of Object.entries(components)) {
+  app.component(key, value);
+}
+
+for (const [key, value] of Object.entries(directives)) {
+  app.directive(key, value);
+}
 
 app.mount("#app");
