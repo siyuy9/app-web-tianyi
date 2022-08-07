@@ -1,11 +1,7 @@
-/*
-Copyright © 2022 kongrentian
-
-*/
 package main
 
-import "gitlab.com/kongrentian-groups/golang/tianyi/cmd"
+import "gitlab.com/kongrentian-group/tianyi/infrastructure/ui/cli"
 
 func main() {
-	cmd.Execute()
+	cli.Execute()
 }

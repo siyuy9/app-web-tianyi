@@ -44,16 +44,31 @@ by [OWASP](https://owasp.org/)
 
 ## resources
 
-- https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-- https://github.com/gofiber/recipes
-- https://github.com/gothinkster/golang-gin-realworld-example-app
-- https://github.com/ansible-semaphore/semaphore
-- https://github.com/alpody/golang-fiber-realworld-example-app
-- https://github.com/primefaces/sakai-vue
-- https://github.com/primefaces/primevue
-- https://dev.to/aryaprakasa/serving-single-page-application-in-a-single-binary-file-with-go-12ij
-- https://github.com/thomasvvugt/fiber-boilerplate/tree/f3afe188347523dc693017ac4450220ef792026c
-- https://www.alexedwards.net/blog/how-to-hash-and-verify-passwords-with-argon2-in-go
-- https://github.com/hashicorp/nomad
-- https://gorm.io/
-- https://docs.gofiber.io/
+- golang
+
+  - https://medium.com/wesionary-team/a-clean-architecture-for-web-application-in-go-lang-4b802dd130bb
+  - https://eltonminetto.dev/en/post/2020-07-06-clean-architecture-2years-later/
+  - https://eltonminetto.dev/en/post/2018-03-05-clean-architecture-using-go/
+  - https://hackernoon.com/golang-clean-archithecture-efd6d7c43047
+  - https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html
+  - https://manakuro.medium.com/clean-architecture-with-go-bce409427d31
+  - https://github.com/eminetto/clean-architecture-go
+  - https://www.rudderstack.com/blog/implementing-graceful-shutdown-in-go
+  - https://github.com/gofiber/recipes
+  - https://github.com/gothinkster/golang-gin-realworld-example-app
+  - https://github.com/alpody/golang-fiber-realworld-example-app
+  - https://dev.to/aryaprakasa/serving-single-page-application-in-a-single-binary-file-with-go-12ij
+  - https://gorm.io/
+  - https://docs.gofiber.io/
+  - https://github.com/thomasvvugt/fiber-boilerplate
+  - https://github.com/ansible-semaphore/semaphore
+
+- security
+
+  - https://cheatsheetseries.owasp.org/cheatsheets/
+  - https://www.alexedwards.net/blog/how-to-hash-and-verify-passwords-with-argon2-in-go
+
+- frontend
+
+  - https://github.com/primefaces/sakai-vue
+  - https://github.com/primefaces/primevue
