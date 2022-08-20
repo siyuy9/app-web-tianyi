@@ -1,32 +1,44 @@
-export const AdminSidebarItems = [
-  {
-    label: "API",
+const SidebarItems = {
+  admin: {
+    asRoot: false,
+    items: [],
+  },
+  user: {
+    asRoot: false,
     items: [
       {
-        label: "Swagger",
-        icon: "pi pi-key",
-        to: { name: "admin_swagger" },
+        label: "Profile",
+        to: { name: "user_profile" },
+      },
+      {
+        label: "Preferences",
+        to: { name: "user_appearance" },
       },
     ],
   },
-];
-
-export const BrowseSidebarItems = [
-  {
-    label: "Projects",
-    icon: "pi pi-folder",
-    to: { name: "browse_projects" },
+  help: {
+    asRoot: false,
+    items: [
+      {
+        label: "API",
+        icon: "pi pi-key",
+        to: { name: "help_swagger" },
+      },
+      {
+        label: "Source code",
+        icon: "pi pi-external-link",
+        url: "https://gitlab.com/kongrentian-group/tianyi",
+      },
+    ],
   },
-  {
-    label: "Groups",
-    icon: "pi pi-share-alt",
-    to: { name: "browse_groups" },
+  project: {
+    asRoot: false,
+    items: [
+      {
+        label: "Pipelines",
+        to: { name: "project_pipelines" },
+      },
+    ],
   },
-];
-
-export const BrowseSidebarItemsWrapper = [
-  {
-    label: "Browse",
-    items: BrowseSidebarItems,
-  },
-];
+};
+export default SidebarItems;

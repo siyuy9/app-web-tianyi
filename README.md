@@ -1,9 +1,37 @@
 # `天意`
 
+## architecture
+
+clean architecture
+![image](./docs/images/clean-architecture-diagram.png)
+([image source](https://github.com/mattia-battiston/clean-architecture-example))
+
+```
+tianyi
+├── api [Interface Adapters]
+│   ├── controller
+│   ├── middleware
+│   ├── presenter
+│   └── router (Router setup)
+├── docs (OpenAPI Specification)
+├── entity [Enterprise Business Rules]
+├── infrastructure [Frameworks and Drivers]
+│   ├── repository (Database interfaces)
+│   ├── server (Server setup)
+│   └── ui
+│       ├── cli
+│       └── web2
+├── pkg (Support packages)
+└── usecase [Application Business Rules]
+    ├── lifecycle
+    └── user
+```
+
 ## logo
 
-![black logo](./frontend/public/images/logo-dark.svg)
-![white logo](./frontend/public/images/logo-white.svg)
+![black logo](./infrastructure/ui/web2/public/images/logo-dark.svg)
+
+![white logo](./infrastructure/ui/web2/public/images/logo-white.svg)
 
 the logo is made with [`google-font-to-svg-path`](https://danmarshall.github.io/google-font-to-svg-path/)
 using font
@@ -16,7 +44,7 @@ using font
 
 ### theme
 
-modified [`sakai-vue` theme](https://github.com/primefaces/sakai-vue) theme
+modified [`sakai-vue`](https://github.com/primefaces/sakai-vue) theme
 with pieces from
 [primevue official website](https://github.com/primefaces/primevue)
 
@@ -55,6 +83,7 @@ by [OWASP](https://owasp.org/)
   - https://github.com/eminetto/clean-architecture-go
   - https://www.rudderstack.com/blog/implementing-graceful-shutdown-in-go
   - https://github.com/gofiber/recipes
+  - https://ldej.nl/post/generating-swagger-docs-from-go/
   - https://github.com/gothinkster/golang-gin-realworld-example-app
   - https://github.com/alpody/golang-fiber-realworld-example-app
   - https://dev.to/aryaprakasa/serving-single-page-application-in-a-single-binary-file-with-go-12ij
@@ -62,6 +91,8 @@ by [OWASP](https://owasp.org/)
   - https://docs.gofiber.io/
   - https://github.com/thomasvvugt/fiber-boilerplate
   - https://github.com/ansible-semaphore/semaphore
+  - https://github.com/spf13/cobra
+  - https://github.com/spf13/viper
 
 - security
 

@@ -1,40 +1,42 @@
 package entity
 
-// User : database model for users
-// http://jinzhu.me/gorm/models.html#model-definition
-// if you want to split null and "", you should use *string instead of string.
+// user entity
 type User struct {
-	commonFields
-	Username     *string `gorm:"uniqueIndex;not null" json:"username"`
-	Email        *string `gorm:"not null"`
-	PasswordHash *string `gorm:"column:password;not null"`
-	Bio          string  `gorm:"size:1024"`
-	Image        *string
-	// "has many" association
-	// https://gorm.io/docs/has_many.html
-	Roles []Role `gorm:"foreignKey:FollowingID"`
+	CommonFields
+	Username string `gorm:"uniqueIndex;not null" json:"username" validate:"required"`
+	Email    string `gorm:"not null" json:"email" validate:"required,email"`
+	// password hash
+	Password string `gorm:"not null" json:"-" validate:"required"`
+	Bio      string `gorm:"size:1024" json:"bio" `
+	Image    string `json:"image"`
+	Admin    bool   `gorm:"default:false" json:"admin"`
+	// "many to many" association
+	// https://gorm.io/docs/many_to_many.html
+	Roles []Role `gorm:"many2many:user_roles;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"roles"`
 }
 
-// Role : represent the user's role
+// used only for password validation, since you cannot validate a password hash
+type Password struct {
+	Value string `validate:"required,min=8,max=64"`
+}
+
+// user role: a collection of permissions
 type Role struct {
-	commonFields
-	Name        string
-	Description string
-	Permissions []Permission
+	CommonFieldsName
+	Description string       `gorm:"size:1024" json:"description"`
+	Permissions []Permission `gorm:"many2many:role_permissions;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"permissions"`
 }
 
-// Permission : represent the user's permission
+// user permission: a path and actions allowed on that path
 type Permission struct {
-	commonFields
-	Name         string
-	Path         string
-	Description  string
-	Capabilities []Capability
+	CommonFieldsName
+	Description  string       `gorm:"size:1024" json:"description"`
+	Path         string       `gorm:"not null" json:"path" validate:"required"`
+	Capabilities []Capability `gorm:"not null;many2many:permission_capabilities;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"capabilities"`
 }
 
-// Capbability : represent the user's capability
+// cabability: allowed action
 type Capability struct {
-	commonFields
-	Name        string
-	Description string
+	CommonFieldsName
+	Description string `gorm:"size:1024" json:"description"`
 }

@@ -32,6 +32,26 @@
     }
   }
 
+  .p-menubar {
+    border: 0;
+    background-color: var(--surface-card);
+  }
+
+  .p-submenu-list {
+    border-radius: $borderRadius;
+    padding: 0.5rem;
+  }
+
+  .p-menuitem-link {
+    border-radius: $borderRadius;
+  }
+
+  .layout-topbar-menu-right {
+    .p-submenu-list {
+      right: 0;
+    }
+  }
+
   .layout-topbar-button {
     display: inline-flex;
     justify-content: center;

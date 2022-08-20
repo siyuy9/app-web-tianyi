@@ -3,18 +3,20 @@
 </template>
 
 <script>
-import EventBus from "../../lib/main/EventBus";
+import { mapState } from "vuex";
 
 export default {
-  themeChangeListener: null,
-  mounted() {
-    this.themeChangeListener = (event) => {
+  computed: mapState("theme", {
+    theme: "theme",
+  }),
+  watch: {
+    theme(newValue, oldValue) {
       const elementId = "theme-link";
       const linkElement = document.getElementById(elementId);
       const cloneLinkElement = linkElement.cloneNode(true);
       const newThemeUrl = linkElement
         .getAttribute("href")
-        .replace(this.$appState.theme, event.theme);
+        .replace(oldValue.name, newValue.name);
 
       cloneLinkElement.setAttribute("id", elementId + "-clone");
       cloneLinkElement.setAttribute("href", newThemeUrl);
@@ -26,15 +28,7 @@ export default {
         cloneLinkElement,
         linkElement.nextSibling
       );
-
-      this.$appState.theme = event.theme;
-      this.$appState.darkTheme = event.dark;
-    };
-
-    EventBus.on("theme-change", this.themeChangeListener);
-  },
-  beforeUnmount() {
-    EventBus.off("theme-change", this.themeChangeListener);
+    },
   },
 };
 </script>

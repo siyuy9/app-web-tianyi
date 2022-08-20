@@ -17,6 +17,7 @@ import ColorPicker from "primevue/colorpicker";
 import Column from "primevue/column";
 import ConfirmDialog from "primevue/confirmdialog";
 import ConfirmPopup from "primevue/confirmpopup";
+import SpeedDial from "primevue/speeddial";
 import ContextMenu from "primevue/contextmenu";
 import DataTable from "primevue/datatable";
 import DataView from "primevue/dataview";
@@ -163,6 +164,7 @@ const UniversalComponents = {
   TreeSelect: TreeSelect,
   TreeTable: TreeTable,
   TriStateCheckbox: TriStateCheckbox,
+  SpeedDial: SpeedDial,
   //
   // custom components
   //

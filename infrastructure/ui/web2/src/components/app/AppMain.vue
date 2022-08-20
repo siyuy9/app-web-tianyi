@@ -1,18 +1,18 @@
 <template>
   <div :class="containerClass" @click="onWrapperClick">
-    <AppTopBar v-if="$route.meta.showTopBar" />
+    <AppTopBar />
+    <Toast position="top-center" />
 
     <div
-      v-if="$route.meta.sidebarItems"
       class="layout-sidebar flex flex-column"
       :class="sidebarCustomZIndex"
       @click="onSidebarClick"
     >
       <div class="layout-menu-container flex-grow-1">
         <AppSubmenu
-          :items="$route.meta.sidebarItems"
+          :sidebarItems="sidebarItems"
           class="layout-menu"
-          :root="true"
+          :root="$route.meta.sidebarAsRoot"
           @menuitem-click="onMenuItemClick"
           @keydown="onMenuKeyDown"
         />
@@ -25,7 +25,7 @@
     </div>
 
     <div
-      v-if="$route.meta.sidebarItems && !isSidebarVisible"
+      v-if="(!isSidebarVisible || mobileMenuActive) && sidebarItems"
       class="layout-sidebar-button-show-container"
     >
       <Button
@@ -35,16 +35,13 @@
       />
     </div>
 
-    <router-view v-if="$route.meta.routerViewShowOutside" />
-
     <div class="layout-main-container" :class="contentClass">
       <div class="layout-main">
-        <router-view v-if="!$route.meta.routerViewShowOutside" />
+        <router-view />
       </div>
-      <AppFooter v-if="$route.meta.showFooter" />
+      <AppFooter />
     </div>
 
-    <AppConfig :layoutMode="layoutMode" @layout-change="onLayoutChange" />
     <transition name="layout-mask">
       <div
         class="layout-mask p-component-overlay"
@@ -56,21 +53,19 @@
 
 <script>
 import AppTopBar from "./AppTopbar.vue";
-import AppConfig from "./AppConfig.vue";
 import AppFooter from "./AppFooter.vue";
 import AppSubmenu from "./AppSubmenu.vue";
 import EventBus from "../../lib/main/EventBus";
+import { mapGetters } from "vuex";
 
 export default {
-  emits: ["change-theme"],
-  setup() {
+  mounted() {
     EventBus.on("app-toast-add", (toast_message) => {
       this.$toast.add(toast_message);
     });
   },
   data() {
     return {
-      layoutMode: "static",
       staticMenuInactive: false,
       overlayMenuActive: false,
       mobileMenuActive: false,
@@ -101,9 +96,6 @@ export default {
 
       this.menuClick = false;
     },
-    menuToggle(event) {
-      this.$emit("menu-toggle", event);
-    },
     onMenuToggle(event) {
       this.menuClick = true;
 
@@ -127,9 +119,6 @@ export default {
     onSidebarClick() {
       this.menuClick = true;
     },
-    onLayoutChange(layoutMode) {
-      this.layoutMode = layoutMode;
-    },
     addClass(element, className) {
       if (element.classList) element.classList.add(className);
       else element.className += " " + className;
@@ -150,6 +139,13 @@ export default {
     },
   },
   computed: {
+    ...mapGetters("theme", {
+      layoutMode: "layoutMode",
+    }),
+
+    sidebarItems() {
+      return this.$route.meta.sidebarItems;
+    },
     sidebarToggleIconClass() {
       return (
         "pi " +
@@ -179,20 +175,18 @@ export default {
           "layout-overlay": this.layoutMode === "overlay",
           "layout-static": this.layoutMode === "static",
           "layout-static-sidebar-inactive":
-            this.staticMenuInactive && this.layoutMode === "static",
+            this.layoutMode === "static" &&
+            (this.staticMenuInactive || !this.sidebarItems),
           "layout-overlay-sidebar-active":
-            this.overlayMenuActive && this.layoutMode === "overlay",
-          "layout-mobile-sidebar-active": this.mobileMenuActive,
+            this.layoutMode === "overlay" &&
+            this.overlayMenuActive &&
+            this.sidebarItems,
+          "layout-mobile-sidebar-active":
+            this.mobileMenuActive && this.sidebarItems,
           "p-input-filled": this.$primevue.config.inputStyle === "filled",
           "p-ripple-disabled": this.$primevue.config.ripple === false,
-          flex: this.$route.meta.containerClassAddFlex === true,
         },
       ];
-    },
-    logo() {
-      return this.$appState.darkTheme
-        ? "images/logo-white.svg"
-        : "images/logo.svg";
     },
   },
   beforeUpdate() {
@@ -202,7 +196,6 @@ export default {
   },
   components: {
     AppTopBar,
-    AppConfig,
     AppFooter,
     AppSubmenu,
   },

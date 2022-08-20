@@ -2,6 +2,10 @@ server:
     port: 8080
     host: localhost
     request_limit: 100
+    jwt:
+        secret: >-
+            @a]@,8{'D+;`8PPA2Cb}v@|?j#6<hvs6{Q}b1!zO*2P$Va?O<|dDPq'Y%%&;P4NNp{;[`x
+        expiration: 72
 
 database:
     type: postgresql

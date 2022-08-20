@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { AdminSidebarItems, BrowseSidebarItemsWrapper } from "./SidebarItems";
 import App from "../../components/app/AppMain.vue";
 import EventBus from "./EventBus";
+import VuexStore from "../store";
+import SidebarItems from "../../lib/main/SidebarItems";
 
 function _import(importPath) {
   return () => import("../../components/" + importPath + ".vue");
@@ -10,18 +11,10 @@ function _import(importPath) {
 const routes = [
   {
     path: "main",
-    meta: {
-      containerClassAddFlex: false,
-      routerViewShowOutside: false,
-      showTopBar: true,
-      showFooter: true,
-    },
+    component: App,
     children: [
       {
         path: "browse",
-        meta: {
-          sidebarItems: BrowseSidebarItemsWrapper,
-        },
         children: [
           {
             path: "groups",
@@ -37,15 +30,55 @@ const routes = [
       },
       {
         path: "admin",
-        name: "admin",
         meta: {
-          sidebarItems: AdminSidebarItems,
+          sidebarItems: SidebarItems.admin.items,
+          sidebarAsRoot: SidebarItems.admin.asRoot,
+        },
+        beforeEnter: () => {
+          return VuexStore.getters["user/admin"];
+        },
+        children: [],
+      },
+      {
+        path: "user",
+        meta: {
+          sidebarItems: SidebarItems.user.items,
+          sidebarAsRoot: SidebarItems.user.asRoot,
+        },
+        children: [
+          {
+            path: "profile",
+            name: "user_profile",
+            component: _import("user/UserProfile"),
+          },
+          {
+            path: "appearance",
+            name: "user_appearance",
+            component: _import("user/UserAppearance"),
+          },
+        ],
+      },
+      {
+        path: "help",
+        meta: {
+          sidebarItems: SidebarItems.help.items,
+          sidebarAsRoot: SidebarItems.help.asRoot,
         },
         children: [
           {
             path: "swagger",
-            name: "admin_swagger",
-            component: _import("admin/AdminSwagger"),
+            name: "help_swagger",
+            component: _import("help/HelpSwagger"),
+          },
+        ],
+      },
+      {
+        path: "projects",
+        children: [
+          {
+            path: "create",
+            name: "project_create",
+            component: _import("project/ProjectCreate"),
           },
         ],
       },
@@ -54,12 +87,6 @@ const routes = [
   {
     path: "detached",
     component: _import("common/FormPage"),
-    meta: {
-      containerClassAddFlex: true,
-      routerViewShowOutside: true,
-      showTopBar: false,
-      showFooter: false,
-    },
     children: [
       {
         path: "auth",
@@ -112,6 +139,14 @@ const routes = [
   },
 ];
 
+const projectRoutes = [
+  {
+    path: "pipelines",
+    name: "project_pipelines",
+    component: _import("project/ProjectPipelines"),
+  },
+];
+
 const routesWrapper = [
   {
     path: "",
@@ -119,18 +154,28 @@ const routesWrapper = [
     redirect: { name: "browse_projects" },
   },
   {
-    path: "/pages",
     component: App,
-    children: routes,
-    // if a root doesn't have a name, redirect to not_found
-    // info - https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
-    beforeEnter: (to) => {
-      return to.name ? true : { name: "invalid_not_found" };
-    },
+    children: [
+      {
+        path: "/:project_path(.*)/-",
+        meta: {
+          sidebarItems: SidebarItems.project.items,
+          sidebarAsRoot: SidebarItems.project.asRoot,
+        },
+        name: "project",
+        component: _import("project/ProjectBase"),
+        redirect: { name: "project_pipelines" },
+        children: projectRoutes,
+      },
+    ],
   },
-  // catch all
-  // https://stackoverflow.com/a/40194152
   {
+    path: "/-",
+    children: routes,
+  },
+  {
+    // catch all
+    // https://router.vuejs.org/guide/essentials/dynamic-matching.html#catch-all-404-not-found-route
     path: "/:pathMatch(.*)*",
     redirect: { name: "invalid_not_found" },
   },
@@ -148,6 +193,23 @@ Router.onError((error) => {
     detail: error,
     life: 3000,
   });
+});
+
+Router.beforeEach((to) => {
+  if (
+    // make sure the user is authenticated
+    !VuexStore.getters["user/isLoggedIn"] &&
+    // allowed pages
+    !["auth_login", "auth_registration", "auth_forgot_password"].includes(
+      to.name
+    )
+  ) {
+    // redirect the user to the login page
+    return { name: "auth_login" };
+  }
+  // if the route doesn't have a name, redirect to not_found
+  // https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
+  return to.name ? true : { name: "invalid_not_found" };
 });
 
 export default Router;
