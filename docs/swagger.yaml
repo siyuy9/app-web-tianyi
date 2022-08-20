@@ -131,11 +131,23 @@ definitions:
   entity.PipelineConfig:
     properties:
       jobs:
-        additionalProperties: true
-        type: object
+        items:
+          $ref: '#/definitions/entity.PipelineConfigJob'
+        type: array
       pipelines:
-        additionalProperties: true
-        type: object
+        items:
+          $ref: '#/definitions/entity.PipelineConfigPipeline'
+        type: array
+    type: object
+  entity.PipelineConfigJob:
+    properties:
+      name:
+        type: string
+    type: object
+  entity.PipelineConfigPipeline:
+    properties:
+      name:
+        type: string
     type: object
   entity.Project:
     properties:

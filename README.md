@@ -84,6 +84,7 @@ by [OWASP](https://owasp.org/)
   - https://www.rudderstack.com/blog/implementing-graceful-shutdown-in-go
   - https://github.com/gofiber/recipes
   - https://ldej.nl/post/generating-swagger-docs-from-go/
+  - https://github.com/hashicorp/hcl
   - https://github.com/gothinkster/golang-gin-realworld-example-app
   - https://github.com/alpody/golang-fiber-realworld-example-app
   - https://dev.to/aryaprakasa/serving-single-page-application-in-a-single-binary-file-with-go-12ij

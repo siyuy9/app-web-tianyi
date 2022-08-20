@@ -754,12 +754,32 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "jobs": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PipelineConfigJob"
+                    }
                 },
                 "pipelines": {
-                    "type": "object",
-                    "additionalProperties": true
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PipelineConfigPipeline"
+                    }
+                }
+            }
+        },
+        "entity.PipelineConfigJob": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.PipelineConfigPipeline": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         },
