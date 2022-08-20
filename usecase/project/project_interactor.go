@@ -37,7 +37,6 @@ func (interactor *interactor) Create(project *entity.Project) error {
 	} else {
 		project.Path = project.Namespace.Path + "/" + project.Name
 	}
-	project.ID = uuid.New()
 	config, err := interactor.branchInteractor.GetRemotePipelineConfig(
 		project.Source, project.DefaultBranch, ".tianyi/config.hcl",
 	)

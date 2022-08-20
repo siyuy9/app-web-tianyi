@@ -75,7 +75,6 @@ func (repository *repository) GetRemotePipelineConfig(
 		URL:           source,
 		SingleBranch:  true,
 		Depth:         1,
-		NoCheckout:    true,
 		ReferenceName: plumbing.NewBranchReferenceName(branch),
 	})
 	if err != nil {
