@@ -32,10 +32,11 @@ func (interactor *interactor) Create(project *entity.Project) error {
 	if err := pkg.ValidateStruct(project); err != nil {
 		return err
 	}
-	if project.Namespace == nil {
+	if project.NamespaceID == uuid.Nil {
 		project.Path = strings.ToLower(project.Name)
 	} else {
-		project.Path = project.Namespace.Path + "/" + project.Name
+		panic("namespaces are not implemented yet")
+		// project.Path = project.Namespace.Path + "/" + project.Name
 	}
 	config, err := interactor.branchInteractor.GetRemotePipelineConfig(
 		project.Source, project.DefaultBranch, ".tianyi/config.hcl",
