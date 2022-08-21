@@ -3,6 +3,8 @@ stages:
 
 trigger:
     stage: stage
+    tags:
+        - trigger
     only:
         - triggers
     script:
