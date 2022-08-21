@@ -1,0 +1,9 @@
+stages:
+    - stage
+
+trigger:
+    stage: stage
+    only:
+        - triggers
+    script:
+        - date
