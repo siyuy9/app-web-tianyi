@@ -1,6 +1,9 @@
 package usecaseBranch
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/google/uuid"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
 	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
@@ -56,10 +59,42 @@ func (interactor *interactor) GetProjectBranches(projectID uuid.UUID) (
 	return interactor.repository.Find(&entity.Branch{ProjectID: projectID})
 }
 
-func (interactor *interactor) GetRemotePipelineConfig(
-	source string, branch string, filePath string,
-) (config *entity.PipelineConfig, err error) {
-	return interactor.repository.GetRemotePipelineConfig(
-		source, branch, filePath,
+func (interactor *interactor) GetBranchFromRemote(
+	project *entity.Project, branch ...string,
+) (*entity.Branch, error) {
+	var branchName string
+	if len(branch) != 0 {
+		branchName = branch[0]
+	} else {
+		branchName = project.DefaultBranch
+	}
+	if project.NamespaceID == nil {
+		project.Path = strings.ToLower(project.Name)
+	} else {
+		return nil, errors.New("namespaces are not implemented yet")
+		// project.Path = project.Namespace.Path + "/" + project.Name
+	}
+	config, err := interactor.repository.GetRemotePipelineConfig(
+		project.Source, branchName, ".tianyi/config.hcl",
 	)
+	if err != nil {
+		return nil, err
+	}
+	return &entity.Branch{Name: branchName, Config: config}, nil
+}
+
+func (interactor *interactor) UpdateBranchFromRemote(
+	project *entity.Project, branchName string,
+) (branch *entity.Branch, err error) {
+	branch, err = interactor.GetProjectBranch(project.ID, branchName)
+	if err != nil {
+		return
+	}
+	branchNew, err := interactor.GetBranchFromRemote(project, branchName)
+	if err != nil {
+		return
+	}
+	branch.Config = branchNew.Config
+	interactor.Update(branch)
+	return
 }

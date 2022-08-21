@@ -90,14 +90,14 @@ func (controller *userController) Create(context *fiber.Ctx) error {
 // @Tags user
 // @Security ApiKeyAuth
 //
-// @Param   id  path     int  true  "account id"
+// @Param   user_id  path     string  true  "account id"
 //
 // @Success 200 {object} entity.User
 // @Failure 500 {object} pkg.Error
 // @Failure 400 {object} pkg.Error
-// @Router /api/v1/users/user/{id} [GET]
+// @Router /api/v1/users/user/{user_id} [GET]
 func (controller *userController) Get(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("user_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
 	}

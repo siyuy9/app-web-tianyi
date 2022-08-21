@@ -1,6 +1,6 @@
 <template>
-  <ul v-if="sidebarItems">
-    <template v-for="(item, i) of sidebarItems">
+  <ul v-if="items">
+    <template v-for="(item, i) of items">
       <li
         v-if="visible(item) && !item.separator"
         :key="item.label || i"
@@ -83,7 +83,7 @@
 <script>
 export default {
   props: {
-    sidebarItems: {
+    items: {
       type: Array,
     },
     root: {

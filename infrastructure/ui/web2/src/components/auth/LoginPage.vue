@@ -107,7 +107,6 @@
 <script>
 import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import axios from "axios";
 import Error from "../../lib/main/Error";
 
 export default {
@@ -136,31 +135,23 @@ export default {
     },
   },
   methods: {
-    handleSubmit(isFormInvalid) {
+    async handleSubmit(isFormInvalid) {
       if (this.submitted || isFormInvalid) {
         return;
       }
       this.submitted = true;
-      axios
-        .post("/api/v1/users/login", {
+      try {
+        await this.$store.dispatch("user/login", {
           username: this.username,
           password: this.password,
-        })
-        .then((response) => {
-          this.$store.commit("user/token", response.data["token"]);
-          axios
-            .get(`/api/v1/users/user/${response.data["id"]}`)
-            .then((responseInfo) => {
-              this.$store.commit("user/user", {
-                ...responseInfo.data,
-                token: response.data["token"],
-              });
-              this.$router.push({ name: "root" });
-            })
-            .catch((error) => Error(error, this.$toast));
-        })
-        .catch((error) => Error(error, this.$toast));
-      this.submitted = false;
+        });
+      } catch (error) {
+        Error(error);
+        return;
+      } finally {
+        this.submitted = false;
+      }
+      this.$router.push({ name: "root" });
     },
   },
 };

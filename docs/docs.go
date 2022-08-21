@@ -129,7 +129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/projects/{id}": {
+        "/api/v1/projects/{project_id}": {
             "get": {
                 "security": [
                     {
@@ -146,7 +146,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "project id",
-                        "name": "id",
+                        "name": "project_id",
                         "in": "path",
                         "required": true
                     }
@@ -186,9 +186,9 @@ const docTemplate = `{
                 "operationId": "update-project",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "project id",
-                        "name": "id",
+                        "name": "project_id",
                         "in": "path",
                         "required": true
                     },
@@ -224,7 +224,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/projects/{id}/branches": {
+        "/api/v1/projects/{project_id}/branches": {
             "get": {
                 "security": [
                     {
@@ -241,7 +241,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "project id",
-                        "name": "id",
+                        "name": "project_id",
                         "in": "path",
                         "required": true
                     }
@@ -280,17 +280,17 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "project id",
-                        "name": "id",
+                        "name": "project_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "pipeline config",
+                        "description": "creation request body",
                         "name": "Body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.PipelineConfig"
+                            "$ref": "#/definitions/controller.RequestBranchCreate"
                         }
                     }
                 ],
@@ -316,7 +316,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/projects/{id}/branches/{name}": {
+        "/api/v1/projects/{project_id}/branches/{branch_name}": {
             "get": {
                 "security": [
                     {
@@ -331,16 +331,16 @@ const docTemplate = `{
                 "operationId": "get-branch",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "project id",
-                        "name": "id",
+                        "name": "project_id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "branch name",
-                        "name": "name",
+                        "name": "branch_name",
                         "in": "path",
                         "required": true
                     }
@@ -382,14 +382,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "project id",
-                        "name": "id",
+                        "name": "project_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "branch name",
-                        "name": "name",
+                        "name": "branch_name",
                         "in": "path",
                         "required": true
                     }
@@ -400,6 +400,61 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/entity.Branch"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/projects/{project_id}/branches/{branch_name}/pipelines/{pipeline_name}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create a pipeline",
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "create a pipeline",
+                "operationId": "create-pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "project id",
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "branch name",
+                        "name": "branch_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "pipeline name",
+                        "name": "pipeline_name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -517,7 +572,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/user/{id}": {
+        "/api/v1/users/user/{user_id}": {
             "get": {
                 "security": [
                     {
@@ -532,9 +587,9 @@ const docTemplate = `{
                 "operationId": "get-user",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "account id",
-                        "name": "id",
+                        "name": "user_id",
                         "in": "path",
                         "required": true
                     }
@@ -578,6 +633,19 @@ const docTemplate = `{
                 },
                 "source": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.RequestBranchCreate": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 3
                 }
             }
         },
@@ -663,55 +731,6 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.Namespace": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "description": "display name",
-                    "type": "string",
-                    "maxLength": 256,
-                    "minLength": 1
-                },
-                "namespace": {
-                    "description": "parent group",
-                    "$ref": "#/definitions/entity.Namespace"
-                },
-                "namespaces": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Namespace"
-                    }
-                },
-                "parent_id": {
-                    "description": "foreign key for the parent group",
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "projects": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Project"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
         "entity.Permission": {
             "type": "object",
             "required": [
@@ -772,10 +791,36 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "type": "string"
+                },
+                "query": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "request_type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
                 }
             }
         },
         "entity.PipelineConfigPipeline": {
+            "type": "object",
+            "properties": {
+                "jobs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.PipelineConfigPipelineJob"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.PipelineConfigPipelineJob": {
             "type": "object",
             "properties": {
                 "name": {
@@ -820,12 +865,8 @@ const docTemplate = `{
                     "maxLength": 256,
                     "minLength": 1
                 },
-                "namespace": {
-                    "description": "parent group",
-                    "$ref": "#/definitions/entity.Namespace"
-                },
                 "namespace_id": {
-                    "description": "foreign key for the parent group",
+                    "description": "foreign key for the parent namespace",
                     "type": "string"
                 },
                 "path": {

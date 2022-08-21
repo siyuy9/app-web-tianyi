@@ -35,14 +35,14 @@ func NewProjectController(
 // @Tags project
 // @Security ApiKeyAuth
 //
-// @Param   id  path     int  true  "project id"
+// @Param   project_id  path     int  true  "project id"
 //
 // @Success 200 {object} entity.Project
 // @Failure 500 {object} pkg.Error
 // @Failure 400 {object} pkg.Error
-// @Router /api/v1/projects/{id} [GET]
+// @Router /api/v1/projects/{project_id} [GET]
 func (controller *projectController) GetByID(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("project_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
 	}
@@ -123,15 +123,15 @@ func (controller *projectController) Create(context *fiber.Ctx) error {
 // @Tags project
 // @Security ApiKeyAuth
 //
-// @Param   id  path     int  true  "project id"
+// @Param   project_id  path     string  true  "project id"
 // @Param Body body entity.Project true "Project body"
 //
 // @Success 200 {object} entity.Project
 // @Failure 500 {object} pkg.Error
 // @Failure 400 {object} pkg.Error
-// @Router /api/v1/projects/{id} [PUT]
+// @Router /api/v1/projects/{project_id} [PUT]
 func (controller *projectController) Update(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("project_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
 	}

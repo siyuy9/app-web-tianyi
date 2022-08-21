@@ -3,27 +3,35 @@
 ## architecture
 
 clean architecture
-![image](./docs/images/clean-architecture-diagram.png)
-([image source](https://github.com/mattia-battiston/clean-architecture-example))
+![image](https://blog.cleancoder.com/uncle-bob/images/2012-08-13-the-clean-architecture/CleanArchitecture.jpg)
 
 ```
 tianyi
 ├── api [Interface Adapters]
 │   ├── controller
 │   ├── middleware
-│   ├── presenter
-│   └── router (Router setup)
+│   └── presenter
 ├── docs (OpenAPI Specification)
 ├── entity [Enterprise Business Rules]
 ├── infrastructure [Frameworks and Drivers]
-│   ├── repository (Database interfaces)
-│   ├── server (Server setup)
-│   └── ui
-│       ├── cli
-│       └── web2
+│   ├── access
+│   ├── app
+│   ├── config
+│   ├── jwt
+│   ├── project
+│   │   └── branch
+│   ├── ui
+│   │   ├── cli
+│   │   └── web2
+│   └── user
 ├── pkg (Support packages)
 └── usecase [Application Business Rules]
+    ├── access
+    ├── app
+    ├── jwt
     ├── lifecycle
+    ├── project
+    │   └── branch
     └── user
 ```
 
@@ -33,13 +41,13 @@ tianyi
 
 ![white logo](./infrastructure/ui/web2/public/images/logo-white.svg)
 
-the logo is made with [`google-font-to-svg-path`](https://danmarshall.github.io/google-font-to-svg-path/)
+it is made with [`google-font-to-svg-path`](https://danmarshall.github.io/google-font-to-svg-path/)
 using font
 [`zen-maru-gothic`](https://fonts.adobe.com/fonts/zen-maru-gothic#licensing-section)
 
 ## frontend
 
-[`vuejs`](https://vuejs.org/) SPA using
+[`vuejs`](https://vuejs.org/) SPA with
 [`primevue`](https://www.primefaces.org/primevue/)
 
 ### theme
@@ -59,7 +67,7 @@ with pieces from
 
 [`gorm`](https://gorm.io/) is used as a driver, so any of
 [these databases](https://gorm.io/docs/connecting_to_the_database.html)
-can be used, theoretically
+can be used
 
 only `postgresql` is configured
 
@@ -68,7 +76,6 @@ only `postgresql` is configured
 passwords are hashed with [Argon2id](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id),
 as suggested in
 [Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
-by [OWASP](https://owasp.org/)
 
 ## resources
 
@@ -86,6 +93,7 @@ by [OWASP](https://owasp.org/)
   - https://ldej.nl/post/generating-swagger-docs-from-go/
   - https://github.com/hashicorp/hcl
   - https://github.com/gothinkster/golang-gin-realworld-example-app
+  - https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
   - https://github.com/alpody/golang-fiber-realworld-example-app
   - https://dev.to/aryaprakasa/serving-single-page-application-in-a-single-binary-file-with-go-12ij
   - https://gorm.io/

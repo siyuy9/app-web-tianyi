@@ -24,9 +24,15 @@ var databaseMigrate = &cobra.Command{
 	},
 }
 
+var databaseCreate = &cobra.Command{
+	Use:   "create",
+	Short: "create resources",
+	Long:  "description",
+}
+
 var databaseAddUser = &cobra.Command{
-	Use:   "addUser",
-	Short: "add user",
+	Use:   "user",
+	Short: "create user",
 	Long:  "description",
 	Run: func(command *cobra.Command, args []string) {
 		interactor := infraApp.New()
@@ -57,7 +63,8 @@ var (
 func init() {
 	rootCmd.AddCommand(databaseCmd)
 	databaseCmd.AddCommand(databaseMigrate)
-	databaseCmd.AddCommand(databaseAddUser)
+	databaseCmd.AddCommand(databaseCreate)
+	databaseCreate.AddCommand(databaseAddUser)
 
 	databaseAddUser.Flags().StringVarP(
 		&username,

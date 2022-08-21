@@ -2,7 +2,6 @@
   <div
     class="flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
   >
-    <Toast position="top-right" />
     <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
       <div
         class="surface-card p-4 border-round w-full lg:w-6"

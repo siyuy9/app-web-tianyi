@@ -7,4 +7,5 @@ type App struct {
 	Lifecycle LifecycleController
 	Project   ProjectController
 	Branch    BranchController
+	Pipeline  PipelineController
 }

@@ -8,15 +8,17 @@
     class="card flex align-items-start flex-column lg:justify-content-between lg:flex-row"
   >
     <div>
-      <div class="font-medium text-3xl text-900">{{ project.name }}</div>
+      <div class="font-medium text-3xl text-900">
+        {{ project_name }}
+      </div>
       <div class="flex align-items-center text-700 flex-wrap">
         <span>
-          Project ID: {{ project.id }}
+          Project ID: {{ project_id }}
           <Button
             icon="pi pi-copy"
             class="p-button-text p-button-plain h-1rem w-2rem"
             v-tooltip.bottom="'Copy project id'"
-            @click="navigator.clipboard.writeText(project.id)"
+            @click="writeToClipboard(project_id)"
           />
         </span>
       </div>
@@ -31,36 +33,45 @@
         </div>
       </div>
       <div
-        v-if="project.description"
+        v-if="project_description"
         class="flex align-items-center text-700 flex-wrap mt-3"
       >
-        <span>{{ project.description }}</span>
+        <span>{{ project_description }}</span>
       </div>
-    </div>
-    <div class="mt-3 lg:mt-0">
-      <Button
-        label="placeholder"
-        class="p-button-outlined mr-2"
-        icon="pi pi-check"
-      ></Button>
     </div>
   </div>
   <router-view />
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
+import Error from "../../lib/main/Error";
+
 export default {
   data() {
-    return {
-      project: {},
-    };
+    return {};
   },
-  beforeMount() {
-    this.$data.project = this.$store.getters["project/project"](
-      this.$route.params.project_path
-    );
+  async beforeMount() {
+    try {
+      // load the current project
+      await this.$store.dispatch(
+        "project/loadProject",
+        this.$route.params.project_path
+      );
+    } catch (error) {
+      Error(error);
+    }
+  },
+  methods: {
+    writeToClipboard: (text) => navigator.clipboard.writeText(text),
   },
   computed: {
+    ...mapGetters("project", {
+      project_id: "id",
+      project_name: "name",
+      project_description: "description",
+    }),
     path() {
       var oldPath = "";
       return this.$route.params.project_path.split("/").map((element) => {
@@ -76,6 +87,5 @@ export default {
       });
     },
   },
-  methods: {},
 };
 </script>

@@ -1,6 +1,7 @@
 package usecaseProject
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/google/uuid"
@@ -32,19 +33,17 @@ func (interactor *interactor) Create(project *entity.Project) error {
 	if err := pkg.ValidateStruct(project); err != nil {
 		return err
 	}
-	if project.NamespaceID == uuid.Nil {
+	if project.NamespaceID == nil {
 		project.Path = strings.ToLower(project.Name)
 	} else {
-		panic("namespaces are not implemented yet")
+		return errors.New("namespaces are not implemented yet")
 		// project.Path = project.Namespace.Path + "/" + project.Name
 	}
-	config, err := interactor.branchInteractor.GetRemotePipelineConfig(
-		project.Source, project.DefaultBranch, ".tianyi/config.hcl",
-	)
+	branch, err := interactor.branchInteractor.GetBranchFromRemote(project)
 	if err != nil {
 		return err
 	}
-	project.Branches = []entity.Branch{{Config: config}}
+	project.Branches = []entity.Branch{*branch}
 	return interactor.repository.Create(project)
 }
 

@@ -8,6 +8,7 @@ import (
 
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
 	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
+	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
 	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
 )
 
@@ -19,13 +20,18 @@ type BranchController interface {
 }
 
 type branchController struct {
-	interactor usecaseBranch.Interactor
+	interactor        usecaseBranch.Interactor
+	projectInteractor usecaseProject.Interactor
 }
 
 func NewbranchController(
 	branchInteractor usecaseBranch.Interactor,
+	projectInteractor usecaseProject.Interactor,
 ) BranchController {
-	return &branchController{interactor: branchInteractor}
+	return &branchController{
+		interactor:        branchInteractor,
+		projectInteractor: projectInteractor,
+	}
 }
 
 // get a project branch
@@ -35,19 +41,19 @@ func NewbranchController(
 // @Tags branch
 // @Security ApiKeyAuth
 //
-// @Param   id  path     int  true  "project id"
-// @Param   name  path     int  true  "branch name"
+// @Param   project_id  path     string  true  "project id"
+// @Param   branch_name  path     string  true  "branch name"
 //
 // @Success 200 {object} entity.Branch
 // @Failure 500 {object} pkg.Error
 // @Failure 400 {object} pkg.Error
-// @Router /api/v1/projects/{id}/branches/{name} [GET]
+// @Router /api/v1/projects/{project_id}/branches/{branch_name} [GET]
 func (controller *branchController) Get(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("project_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
 	}
-	name := context.Params("name")
+	name := context.Params("branch_name")
 	if name == "" {
 		return pkg.NewErrorBadRequest("name is empty")
 	}
@@ -65,13 +71,13 @@ func (controller *branchController) Get(context *fiber.Ctx) error {
 // @Tags branch
 // @Security ApiKeyAuth
 //
-// @Param   id  path     string  true  "project id"
+// @Param   project_id  path     string  true  "project id"
 //
 // @Success 200 {object} []entity.Branch
 // @Failure 500 {object} pkg.Error
-// @Router /api/v1/projects/{id}/branches [GET]
+// @Router /api/v1/projects/{project_id}/branches [GET]
 func (controller *branchController) GetProjectBranches(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("project_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
 	}
@@ -93,21 +99,17 @@ type RequestBranchCreate struct {
 // @Tags branch
 // @Security ApiKeyAuth
 //
-// @Param id   path string                 true  "project id"
-// @Param Body body entity.PipelineConfig true  "pipeline config"
+// @Param project_id   path string                 true  "project id"
+// @Param Body body RequestBranchCreate true  "creation request body"
 //
 // @Success 200 {object} entity.Branch
 // @Failure 500 {object} pkg.Error
 // @Failure 400 {object} pkg.Error
-// @Router /api/v1/projects/{id}/branches [POST]
+// @Router /api/v1/projects/{project_id}/branches [POST]
 func (controller *branchController) Create(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("project_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
-	}
-	name := context.Params("name")
-	if name != "" {
-		return pkg.NewErrorBadRequest("name is empty")
 	}
 	request := &RequestBranchCreate{}
 	if err = parse(context, request); err != nil {
@@ -127,25 +129,29 @@ func (controller *branchController) Create(context *fiber.Ctx) error {
 // @Tags branch
 // @Security ApiKeyAuth
 //
-// @Param   id  path     string  true  "project id"
-// @Param name path string                 true  "branch name"
+// @Param   project_id  path     string  true  "project id"
+// @Param branch_name path string                 true  "branch name"
 //
 // @Success 200 {object} entity.Branch
 // @Failure 500 {object} pkg.Error
 // @Failure 400 {object} pkg.Error
-// @Router /api/v1/projects/{id}/branches/{name} [PUT]
+// @Router /api/v1/projects/{project_id}/branches/{branch_name} [PUT]
 func (controller *branchController) Update(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("id"))
+	id, err := uuid.Parse(context.Params("project_id"))
 	if err != nil {
 		return pkg.NewErrorBadRequest(err)
 	}
-	branch := &entity.Branch{}
-	if err = parse(context, branch); err != nil {
+	branchName := context.Params("branch_name")
+	if branchName == "" {
+		return pkg.NewErrorBadRequest(err)
+	}
+	project, err := controller.projectInteractor.Get(id)
+	if err != nil {
 		return err
 	}
-	branch.ID = id
-	if err = controller.interactor.Update(branch); err != nil {
-		return err
+	branch, err := controller.interactor.UpdateBranchFromRemote(project, branchName)
+	if err != nil {
+		return nil
 	}
 	return context.Status(http.StatusOK).JSON(branch)
 }

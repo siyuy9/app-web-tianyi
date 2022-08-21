@@ -14,9 +14,14 @@ type Interactor interface {
 	GetProjectBranches(projectID uuid.UUID) ([]entity.Branch, error)
 	GetAll() ([]entity.Branch, error)
 	Get(id uuid.UUID) (*entity.Branch, error)
+	// get a branch from the remote source
 	// clone the branch from source with depth 1, then parse the file
-	GetRemotePipelineConfig(source string, branch string, filePath string) (
-		config *entity.PipelineConfig, err error,
+	GetBranchFromRemote(project *entity.Project, branch ...string) (
+		*entity.Branch, error,
+	)
+	// update the branch
+	UpdateBranchFromRemote(project *entity.Project, branchName string) (
+		branch *entity.Branch, err error,
 	)
 }
 

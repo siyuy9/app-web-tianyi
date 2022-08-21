@@ -13,11 +13,11 @@
         </div>
         <div class="field grid">
           <label for="field_created_at">Created at</label>
-          <InputText id="field_created_at" v-model="created_at" type="text" />
+          <InputText id="field_created_at" v-model="createdAt" type="text" />
         </div>
         <div class="field grid">
           <label for="field_updated_at">Updated at</label>
-          <InputText id="field_updated_at" v-model="updated_at" type="text" />
+          <InputText id="field_updated_at" v-model="updatedAt" type="text" />
         </div>
         <div class="field grid">
           <label for="field_username">Username</label>
@@ -49,32 +49,19 @@
 import { mapGetters } from "vuex";
 
 export default {
-  data() {
-    return {
-      id: this.getId(),
-      admin: this.getAdmin(),
-      created_at: this.getCreatedAt(),
-      updated_at: this.getUpdatedAt(),
-      username: this.getUsername(),
-      email: this.getEmail(),
-      bio: this.getBio(),
-      image: this.getImage(),
-      roles: this.getRoles(),
-      token: this.getToken(),
-    };
-  },
-  methods: {
+  computed: {
     ...mapGetters("user", {
-      getId: "id",
-      getAdmin: "admin",
-      getCreatedAt: "created_at",
-      getUpdatedAt: "updated_at",
-      getUsername: "username",
-      getEmail: "email",
-      getBio: "bio",
-      getImage: "image",
-      getRoles: "roles",
-      getToken: "token",
+      id: "id",
+      admin: "admin",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      username: "username",
+      email: "email",
+      bio: "bio",
+      image: "image",
+      roles: "roles",
+      token: "token",
+      user: "user",
     }),
   },
 };

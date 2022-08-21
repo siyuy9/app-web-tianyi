@@ -11,6 +11,15 @@ definitions:
     - name
     - source
     type: object
+  controller.RequestBranchCreate:
+    properties:
+      name:
+        maxLength: 64
+        minLength: 3
+        type: string
+    required:
+    - name
+    type: object
   controller.UserRequestCreate:
     properties:
       email:
@@ -68,40 +77,6 @@ definitions:
     required:
     - name
     type: object
-  entity.Namespace:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/sql.NullTime'
-      id:
-        type: string
-      name:
-        description: display name
-        maxLength: 256
-        minLength: 1
-        type: string
-      namespace:
-        $ref: '#/definitions/entity.Namespace'
-        description: parent group
-      namespaces:
-        items:
-          $ref: '#/definitions/entity.Namespace'
-        type: array
-      parent_id:
-        description: foreign key for the parent group
-        type: string
-      path:
-        type: string
-      projects:
-        items:
-          $ref: '#/definitions/entity.Project'
-        type: array
-      updated_at:
-        type: string
-    required:
-    - name
-    type: object
   entity.Permission:
     properties:
       capabilities:
@@ -143,8 +118,25 @@ definitions:
     properties:
       name:
         type: string
+      query:
+        additionalProperties:
+          type: string
+        type: object
+      request_type:
+        type: string
+      url:
+        type: string
     type: object
   entity.PipelineConfigPipeline:
+    properties:
+      jobs:
+        items:
+          $ref: '#/definitions/entity.PipelineConfigPipelineJob'
+        type: array
+      name:
+        type: string
+    type: object
+  entity.PipelineConfigPipelineJob:
     properties:
       name:
         type: string
@@ -172,11 +164,8 @@ definitions:
         maxLength: 256
         minLength: 1
         type: string
-      namespace:
-        $ref: '#/definitions/entity.Namespace'
-        description: parent group
       namespace_id:
-        description: foreign key for the parent group
+        description: foreign key for the parent namespace
         type: string
       path:
         type: string
@@ -357,14 +346,14 @@ paths:
       summary: create a project
       tags:
       - project
-  /api/v1/projects/{id}:
+  /api/v1/projects/{project_id}:
     get:
       description: get a project
       operationId: get-project
       parameters:
       - description: project id
         in: path
-        name: id
+        name: project_id
         required: true
         type: integer
       responses:
@@ -391,9 +380,9 @@ paths:
       parameters:
       - description: project id
         in: path
-        name: id
+        name: project_id
         required: true
-        type: integer
+        type: string
       - description: Project body
         in: body
         name: Body
@@ -418,14 +407,14 @@ paths:
       summary: update a project
       tags:
       - project
-  /api/v1/projects/{id}/branches:
+  /api/v1/projects/{project_id}/branches:
     get:
       description: get all branches
       operationId: get-branches
       parameters:
       - description: project id
         in: path
-        name: id
+        name: project_id
         required: true
         type: string
       responses:
@@ -450,15 +439,15 @@ paths:
       parameters:
       - description: project id
         in: path
-        name: id
+        name: project_id
         required: true
         type: string
-      - description: pipeline config
+      - description: creation request body
         in: body
         name: Body
         required: true
         schema:
-          $ref: '#/definitions/entity.PipelineConfig'
+          $ref: '#/definitions/controller.RequestBranchCreate'
       responses:
         "200":
           description: OK
@@ -477,21 +466,21 @@ paths:
       summary: create a branch
       tags:
       - branch
-  /api/v1/projects/{id}/branches/{name}:
+  /api/v1/projects/{project_id}/branches/{branch_name}:
     get:
       description: get a project branch
       operationId: get-branch
       parameters:
       - description: project id
         in: path
-        name: id
+        name: project_id
         required: true
-        type: integer
+        type: string
       - description: branch name
         in: path
-        name: name
+        name: branch_name
         required: true
-        type: integer
+        type: string
       responses:
         "200":
           description: OK
@@ -516,12 +505,12 @@ paths:
       parameters:
       - description: project id
         in: path
-        name: id
+        name: project_id
         required: true
         type: string
       - description: branch name
         in: path
-        name: name
+        name: branch_name
         required: true
         type: string
       responses:
@@ -542,6 +531,42 @@ paths:
       summary: update a branch
       tags:
       - branch
+  /api/v1/projects/{project_id}/branches/{branch_name}/pipelines/{pipeline_name}:
+    post:
+      description: create a pipeline
+      operationId: create-pipeline
+      parameters:
+      - description: project id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: branch name
+        in: path
+        name: branch_name
+        required: true
+        type: string
+      - description: pipeline name
+        in: path
+        name: pipeline_name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: create a pipeline
+      tags:
+      - pipeline
   /api/v1/users:
     get:
       description: get all users
@@ -608,16 +633,16 @@ paths:
       summary: login
       tags:
       - user
-  /api/v1/users/user/{id}:
+  /api/v1/users/user/{user_id}:
     get:
       description: get a user
       operationId: get-user
       parameters:
       - description: account id
         in: path
-        name: id
+        name: user_id
         required: true
-        type: integer
+        type: string
       responses:
         "200":
           description: OK

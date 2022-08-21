@@ -6,7 +6,7 @@ import (
 
 type Branch struct {
 	CommonFields
-	ProjectID uuid.UUID       `gorm:"not null;index:branch_name,unique;" json:"project_id"`
+	ProjectID uuid.UUID       `gorm:"type:uuid;not null;index:branch_name,unique;" json:"project_id"`
 	Name      string          `gorm:"not null;index:branch_name,unique;size:256" json:"name" validate:"required,min=1,max=256"`
 	Config    *PipelineConfig `gorm:"not null;serializer:json" json:"config"`
 }
@@ -14,8 +14,8 @@ type Branch struct {
 // project
 type Project struct {
 	CommonFields
-	// foreign key for the parent group
-	NamespaceID uuid.UUID `gorm:"index:project_name,unique" json:"namespace_id"`
+	// foreign key for the parent namespace
+	NamespaceID *uuid.UUID `gorm:"type:uuid;index:project_name,unique" json:"namespace_id"`
 	// display name
 	Name          string   `gorm:"index:project_name,unique;size:256" json:"name" validate:"required,min=1,max=256"`
 	Path          string   `gorm:"uniqueIndex" json:"path"`
@@ -29,7 +29,7 @@ type Project struct {
 type Namespace struct {
 	CommonFields
 	// foreign key for the parent group
-	ParentID uuid.UUID `gorm:"index:namespace_name,unique" json:"parent_id"`
+	ParentID *uuid.UUID `gorm:"type:uuid;index:namespace_name,unique" json:"parent_id"`
 	// display name
 	Name       string      `gorm:"index:namespace_name,unique;size:256" json:"name" validate:"required,min=1,max=256"`
 	Path       string      `json:"path"`

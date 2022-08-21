@@ -5,7 +5,7 @@ import VuexStore from "../store";
 import SidebarItems from "../../lib/main/SidebarItems";
 
 function _import(importPath) {
-  return () => import("../../components/" + importPath + ".vue");
+  return () => import(`../../components/${importPath}.vue`);
 }
 
 const routes = [
@@ -145,6 +145,11 @@ const projectRoutes = [
     name: "project_pipelines",
     component: _import("project/ProjectPipelines"),
   },
+  {
+    path: "pipelines/:pipeline_branch/:pipeline_name",
+    name: "project_pipeline",
+    component: _import("project/ProjectPipeline"),
+  },
 ];
 
 const routesWrapper = [
@@ -152,6 +157,10 @@ const routesWrapper = [
     path: "",
     name: "root",
     redirect: { name: "browse_projects" },
+  },
+  {
+    path: "/-",
+    children: routes,
   },
   {
     component: App,
@@ -168,10 +177,6 @@ const routesWrapper = [
         children: projectRoutes,
       },
     ],
-  },
-  {
-    path: "/-",
-    children: routes,
   },
   {
     // catch all

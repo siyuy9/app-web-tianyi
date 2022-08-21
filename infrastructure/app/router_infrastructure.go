@@ -47,15 +47,17 @@ func setupRouter(
 	users := api.Group("users")
 	projects := api.Group("projects")
 	database := api.Group("database")
-	project := projects.Group(":id")
+	project := projects.Group(":project_id")
 	branches := project.Group("branches")
-	branch := branches.Group(":name")
+	branch := branches.Group(":branch_name")
+	pipelines := branch.Group("pipelines")
+	pipeline := pipelines.Group(":pipeline_name")
 
 	// user routes
 	users.Get("", app.User.GetAll)
 	users.Post("", app.User.Create)
 	users.Post("login", app.User.Login)
-	users.Get("user/:id", app.User.Get)
+	users.Get("user/:user_id", app.User.Get)
 
 	// project routes
 	projects.Get("", app.Project.Get)
@@ -68,6 +70,9 @@ func setupRouter(
 	branches.Get("", app.Branch.GetProjectBranches)
 
 	branch.Get("", app.Branch.Get)
+	branch.Put("", app.Branch.Update)
+
+	pipeline.Post("", app.Pipeline.Create)
 
 	// swagger routes
 	api.Use("swagger", app.Frontend.ServeSwagger)

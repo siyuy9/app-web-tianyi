@@ -193,6 +193,11 @@ func (server *server) SetupController() {
 		),
 		Branch: controller.NewbranchController(
 			server.interactors.Branch,
+			server.interactors.Project,
+		),
+		Pipeline: controller.NewPipelineController(
+			server.interactors.Branch,
+			server.interactors.Project,
 		),
 	}
 }

@@ -32,11 +32,25 @@ const SidebarItems = {
     ],
   },
   project: {
-    asRoot: false,
+    asRoot: true,
     items: [
       {
-        label: "Pipelines",
-        to: { name: "project_pipelines" },
+        label: "Workload",
+        items: [
+          {
+            label: "Pipelines",
+            to: { name: "project_pipelines" },
+          },
+        ],
+      },
+      {
+        label: "Settings",
+        items: [
+          {
+            label: "Repository",
+            //to: { name: "project_pipelines" },
+          },
+        ],
       },
     ],
   },

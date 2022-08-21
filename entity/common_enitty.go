@@ -8,7 +8,7 @@ import (
 )
 
 type CommonFields struct {
-	ID        uuid.UUID    `gorm:"primary_key;default:uuid_generate_v4()" json:"id"`
+	ID        uuid.UUID    `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	DeletedAt sql.NullTime `json:"deleted_at,omitempty"`

@@ -1,7 +1,6 @@
 <template>
   <div :class="containerClass" @click="onWrapperClick">
     <AppTopBar />
-    <Toast position="top-center" />
 
     <div
       class="layout-sidebar flex flex-column"
@@ -10,7 +9,7 @@
     >
       <div class="layout-menu-container flex-grow-1">
         <AppSubmenu
-          :sidebarItems="sidebarItems"
+          :items="sidebarItems"
           class="layout-menu"
           :root="$route.meta.sidebarAsRoot"
           @menuitem-click="onMenuItemClick"
@@ -55,15 +54,9 @@
 import AppTopBar from "./AppTopbar.vue";
 import AppFooter from "./AppFooter.vue";
 import AppSubmenu from "./AppSubmenu.vue";
-import EventBus from "../../lib/main/EventBus";
 import { mapGetters } from "vuex";
 
 export default {
-  mounted() {
-    EventBus.on("app-toast-add", (toast_message) => {
-      this.$toast.add(toast_message);
-    });
-  },
   data() {
     return {
       staticMenuInactive: false,
