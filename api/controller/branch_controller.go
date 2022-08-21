@@ -149,7 +149,9 @@ func (controller *branchController) Update(context *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	branch, err := controller.interactor.UpdateBranchFromRemote(project, branchName)
+	branch, err := controller.interactor.UpdateBranchFromRemote(
+		project, branchName,
+	)
 	if err != nil {
 		return nil
 	}
