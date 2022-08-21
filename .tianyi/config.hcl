@@ -6,9 +6,9 @@ job "job1" "POST" {
 }
 
 pipeline "pipeline1" {
-    job "job1"
+    job "job1" {}
 }
 
 pipeline "pipeline2" {
-    job "job1"
+    job "job1" {}
 }
