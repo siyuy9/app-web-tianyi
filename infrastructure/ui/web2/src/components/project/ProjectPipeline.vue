@@ -2,7 +2,12 @@
   <div class="card">
     <div class="flex justify-content-between">
       <div class="font-medium text-3xl text-900 mb-3">{{ pipeline.name }}</div>
-      <Button label="Run" class="p-button-outlined"></Button>
+      <Button
+        label="Run"
+        class="p-button-outlined"
+        :loading="pipelineLaunched"
+        @click="createPipeline"
+      ></Button>
     </div>
     <div class="text-500 mb-5">
       {{ pipeline.description ? pipeline.description : "no description" }}
@@ -18,13 +23,16 @@
 </template>
 
 <script>
+import axios from "axios";
 import { mapGetters } from "vuex";
 import Error from "../../lib/main/Error";
+import EventBus from "../../lib/main/EventBus";
 
 export default {
   data() {
     return {
       pipelineData: {},
+      pipelineLaunched: false,
     };
   },
   computed: {
@@ -33,9 +41,32 @@ export default {
     },
     ...mapGetters("project", {
       branch: "branch",
+      project_id: "id",
     }),
     jobs() {
       return this.branch.config.jobs;
+    },
+  },
+  methods: {
+    createPipeline() {
+      if (this.pipelineLaunched) {
+        return;
+      }
+      this.pipelineLaunched = true;
+      axios
+        .post(
+          `/api/v1/projects/${this.project_id}/branches/${this.$route.params.pipeline_branch}/pipelines/${this.$route.params.pipeline_name}`
+        )
+        .then((response) =>
+          EventBus.emit("app-toast-add", {
+            severity: "success",
+            summary: "pipeline launched",
+            detail: response.data.web_url,
+            life: 3000,
+          })
+        )
+        .catch(Error)
+        .finally(() => (this.pipelineLaunched = false));
     },
   },
   async beforeMount() {

@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -60,7 +62,7 @@ func (controller *pipelineController) Create(context *fiber.Ctx) error {
 		return err
 	}
 	for _, pipeline := range branch.Config.Pipelines {
-		if pipeline.Name != context.Params("branch_name") {
+		if pipeline.Name != context.Params("pipeline_name") {
 			continue
 		}
 		for _, pipelineJob := range pipeline.Jobs {
@@ -72,7 +74,9 @@ func (controller *pipelineController) Create(context *fiber.Ctx) error {
 				}
 			}
 			if jobConfig == nil {
-				break
+				return errors.New(
+					"missing declaration for job " + pipelineJob.Name,
+				)
 			}
 			request, err := http.NewRequest(
 				jobConfig.RequestType, jobConfig.URL, nil,
@@ -89,7 +93,16 @@ func (controller *pipelineController) Create(context *fiber.Ctx) error {
 			if err != nil {
 				return err
 			}
-			context.Status(http.StatusOK).JSON(response)
+			defer response.Body.Close()
+			responseBody, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				return err
+			}
+			var responseMap map[string]interface{}
+			if err := json.Unmarshal(responseBody, &responseMap); err != nil {
+				return err
+			}
+			return context.Status(response.StatusCode).JSON(responseMap)
 		}
 	}
 	return errors.New("no jobs to run")

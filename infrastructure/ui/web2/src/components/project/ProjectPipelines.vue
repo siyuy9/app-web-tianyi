@@ -46,7 +46,7 @@ import Error from "../../lib/main/Error";
 export default {
   data() {
     return {
-      currentBranchData: null,
+      currentBranchData: {},
       branches: [],
     };
   },
