@@ -98,7 +98,7 @@ export default {
           `/api/v1/projects/${this.project_id}/branches/${this.currentBranch.name}`
         )
         .then(() =>
-          this.loadBranch(this.currentBranch.name).then(async () =>
+          this.loadBranch(this.currentBranch.name).then(() =>
             EventBus.emit("app-toast-add", {
               severity: "success",
               summary: "branch updated",

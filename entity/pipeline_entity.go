@@ -9,7 +9,7 @@ type PipelineConfigJob struct {
 	Name        string            `hcl:"name,label" json:"name"`
 	RequestType string            `hcl:"request_type,label" json:"request_type"`
 	URL         string            `hcl:"url" json:"url"`
-	Query       map[string]string `hcl:"query" json:"query"`
+	Form        map[string]string `hcl:"form" json:"form"`
 }
 
 type PipelineConfigPipelineJob struct {

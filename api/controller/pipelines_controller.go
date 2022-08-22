@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -89,6 +90,7 @@ func (controller *pipelineController) Create(context *fiber.Ctx) error {
 				query.Add(key, value)
 			}
 			request.URL.RawQuery = query.Encode()
+			log.Println(query.Encode())
 			response, err := http.DefaultClient.Do(request)
 			if err != nil {
 				return err
