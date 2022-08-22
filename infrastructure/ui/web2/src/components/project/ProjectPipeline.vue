@@ -65,7 +65,7 @@ export default {
             life: 3000,
           })
         )
-        .catch((error) => Error(error))
+        .catch(Error)
         .finally(() => (this.pipelineLaunched = false));
     },
   },

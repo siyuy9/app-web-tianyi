@@ -19,6 +19,12 @@
         <div>{{ slotProps.option.name }}</div>
       </template>
     </Dropdown>
+    <Button
+      label="Update"
+      class="p-button-outlined mx-3"
+      :loading="branchUpdating"
+      @click="updateBranch"
+    ></Button>
   </div>
   <DataTable :value="pipelines" responsiveLayout="scroll" class="card">
     <Column field="name" header="Name">
@@ -42,18 +48,23 @@
 <script>
 import { mapGetters } from "vuex";
 
+import axios from "axios";
 import Error from "../../lib/main/Error";
+import EventBus from "../../lib/main/EventBus";
+
 export default {
   data() {
     return {
       currentBranchData: {},
       branches: [],
+      branchUpdating: false,
     };
   },
   computed: {
     ...mapGetters("project", {
       branch: "branch",
       default_branch: "default_branch",
+      project_id: "id",
     }),
     currentBranch() {
       return this.currentBranchData;
@@ -66,11 +77,37 @@ export default {
     async currentBranchData(newBranch, oldBranch) {
       try {
         // load the default branch
-        await this.$store.dispatch("project/loadBranch", newBranch.name);
+        await this.loadBranch(newBranch.name);
       } catch (error) {
         Error(error);
         this.currentBranchData = oldBranch;
       }
+    },
+  },
+  methods: {
+    loadBranch(branchName) {
+      return this.$store.dispatch("project/loadBranch", branchName);
+    },
+    updateBranch() {
+      if (this.branchUpdating) {
+        return;
+      }
+      this.branchUpdating = true;
+      axios
+        .put(
+          `/api/v1/projects/${this.project_id}/branches/${this.currentBranch.name}`
+        )
+        .then(() =>
+          this.loadBranch(this.currentBranch.name).then(async () =>
+            EventBus.emit("app-toast-add", {
+              severity: "success",
+              summary: "branch updated",
+              life: 5000,
+            })
+          )
+        )
+        .catch(Error)
+        .finally(() => (this.branchUpdating = false));
     },
   },
   async beforeMount() {

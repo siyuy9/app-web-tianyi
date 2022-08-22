@@ -39,18 +39,28 @@ func setupRouter(
 	// redirect for gitlab-runners
 
 	// groups
+	// /api
 	apiRoot := router.Group(
 		"api",
 		middleware.NewJWTMiddleware(config.Server.JWT.GetSecret()),
 	)
+	// /api/v1
 	api := apiRoot.Group("v1")
+	// /api/v1/users
 	users := api.Group("users")
+	// /api/v1/projects
 	projects := api.Group("projects")
+	// /api/v1/database
 	database := api.Group("database")
+	// /api/v1/projects/:project_id
 	project := projects.Group(":project_id")
+	// /api/v1/projects/:project_id/branches
 	branches := project.Group("branches")
+	// /api/v1/projects/:project_id/branches/:branch_name
 	branch := branches.Group(":branch_name")
+	// /api/v1/projects/:project_id/branches/:branch_name/pipelines
 	pipelines := branch.Group("pipelines")
+	// /api/v1/projects/:project_id/branches/:branch_name/pipelines/:pipeline_name
 	pipeline := pipelines.Group(":pipeline_name")
 
 	// user routes

@@ -10,7 +10,7 @@ export default async function AddErrorMessages(error, toast) {
       severity: "error",
       summary: error.message,
       detail: error,
-      life: 3000,
+      life: 5000,
     });
     return;
   }
@@ -19,7 +19,7 @@ export default async function AddErrorMessages(error, toast) {
       severity: "error",
       summary: error.message,
       detail: key === "body" ? value : `${key}: ${value}`,
-      life: 3000,
+      life: 5000,
     });
   }
 }
