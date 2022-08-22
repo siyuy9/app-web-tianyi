@@ -3,8 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -90,18 +88,14 @@ func (controller *pipelineController) Create(context *fiber.Ctx) error {
 				query.Add(key, value)
 			}
 			request.URL.RawQuery = query.Encode()
-			log.Println(query.Encode())
 			response, err := http.DefaultClient.Do(request)
 			if err != nil {
 				return err
 			}
 			defer response.Body.Close()
-			responseBody, err := ioutil.ReadAll(response.Body)
-			if err != nil {
-				return err
-			}
 			var responseMap map[string]interface{}
-			if err := json.Unmarshal(responseBody, &responseMap); err != nil {
+			err = json.NewDecoder(response.Body).Decode(&responseMap)
+			if err != nil {
 				return err
 			}
 			return context.Status(response.StatusCode).JSON(responseMap)
