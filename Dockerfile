@@ -1,7 +1,12 @@
-FROM golang:1.19 as base
-WORKDIR "/src"
+FROM node:latest as web
+WORKDIR /src
 COPY . .
-RUN cd web && yard build && CGO_ENABLED=0 go build -o app
+RUN npm install --global yarn && cd web && yarn build
+
+FROM golang:1.19 as base
+WORKDIR /src
+COPY --from=web . .
+RUN CGO_ENABLED=0 go build -o app
 
 FROM alpine:latest as final
 WORKDIR /app
