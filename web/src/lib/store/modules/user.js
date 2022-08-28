@@ -30,7 +30,8 @@ const actions = {
         if (auth.remember_me) {
           dispatch("persist");
         }
-      });
+      })
+      .catch((error) => error);
   },
   initializeStore({ commit }) {
     var user = localStorage.getItem("user");
