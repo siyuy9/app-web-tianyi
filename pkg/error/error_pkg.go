@@ -74,10 +74,11 @@ func (customError *customError) StatusCode() int {
 	return customError.statusCode
 }
 
-// if it is Error, call ErrorWithoutStacktrace, otherwise just call Error
+// if it is Error, call ErrorWithoutStacktrace on it's inner error,
+// otherwise just call Error
 func ErrorWithoutStacktrace(err error) string {
 	if assertedError, ok := err.(Error); ok {
-		return ErrorWithoutStacktrace(assertedError.Unwrap())
+		return ErrorWithoutStacktrace(assertedError.ErrorInner())
 	}
 	return err.Error()
 }
