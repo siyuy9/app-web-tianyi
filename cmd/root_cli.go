@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var configFile string
-
 var rootCmd = &cobra.Command{
 	Use:   "tianyi",
 	Short: "tianyi",
@@ -28,12 +26,16 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(
-		&configFile,
+	rootCmd.PersistentFlags().StringP(
 		"config",
 		"c",
 		"",
 		"config path",
 	)
-	viper.BindPFlag("config", rootCmd.Flags().Lookup("config"))
+	err := viper.BindPFlag(
+		"config", rootCmd.PersistentFlags().Lookup("config"),
+	)
+	if err != nil {
+		panic(err)
+	}
 }

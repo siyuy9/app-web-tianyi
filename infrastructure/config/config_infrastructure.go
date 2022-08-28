@@ -21,6 +21,10 @@ type App struct {
 	Database *Database     `mapstructure:"database"`
 	Redis    *redis.Config `mapstructure:"redis"`
 	Fiber    *fiber.Config `mapstructure:"fiber"`
+	// have to keep it here, otherwise viper.UnmarshalExact will throw an error
+	// because there is s CLI flag 'config', but the struct does not have a
+	// corresponding field
+	ConfigPath string `mapstructure:"config"`
 }
 
 type Server struct {
@@ -112,7 +116,6 @@ func (app *App) Populate() *App {
 	// e.g., TIANYI_CONFIG for '--config' flag
 	viper.SetEnvPrefix("tianyi")
 	viper.AutomaticEnv()
-
 	if fromCmd := viper.GetString("config"); fromCmd != "" {
 		// get config path from cmd or from environment
 		viper.SetConfigFile(fromCmd)
@@ -140,16 +143,17 @@ func (app *App) Populate() *App {
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Panicln("Error initializing config file: ", err)
+		log.Fatalf("could not read config file: %v", err)
 	}
 	configPath := viper.ConfigFileUsed()
+	log.Println(viper.AllSettings())
 	if err := viper.UnmarshalExact(app); err != nil {
-		log.Panicf(
-			"Could not unmarshal the config file %s: %s",
+		log.Fatalf(
+			"could not unmarshal config file '%s': %v",
 			configPath,
 			err,
 		)
 	}
-	log.Println("Using config file: ", configPath)
+	log.Println("Using config file:", configPath)
 	return app
 }
