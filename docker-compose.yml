@@ -38,7 +38,7 @@ services:
 
     tianyi:
         container_name: tianyi_server
-        image: kongrentian/tianyi:latest
+        image: kongrentian/tianyi:${CI_COMMIT_REF_NAME}
         volumes:
             - ./tianyi.yml:/app/
         networks:
