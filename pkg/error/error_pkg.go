@@ -13,6 +13,7 @@ type Error interface {
 	Unwrap() error
 	StatusCode() int
 	ErrorWithFrame
+	ErrorWithoutStacktrace() string
 }
 
 const (
@@ -48,6 +49,10 @@ func NewWithCode(err error, code int, frame ...int) error {
 }
 
 func (customError *customError) Error() string {
+	return Stacktrace(customError)
+}
+
+func (customError *customError) ErrorWithoutStacktrace() string {
 	return customError.err.Error()
 }
 
@@ -76,16 +81,14 @@ func Stacktrace(err error) string {
 }
 
 func putStacktrace(err error, buffer *bytes.Buffer) {
-	fmt.Fprint(buffer, err)
+	fmt.Fprintf(buffer, "%v", err)
 	errorWithFrame, ok := err.(ErrorWithFrame)
 	var frame *runtime.Frame
 	if ok {
 		frame = errorWithFrame.Frame()
 	}
 	if frame != nil {
-		fmt.Fprintf(
-			buffer, "\n    %s:%d %s", frame.File, frame.Line, frame.Function,
-		)
+		fmt.Fprintf(buffer, "\n    %s:%d", frame.File, frame.Line)
 	}
 	fmt.Fprint(buffer, "\n")
 }
