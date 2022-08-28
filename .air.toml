@@ -22,7 +22,7 @@ swag init \
 && go build -o target/tianyi \
 """
 # Binary file yields from `cmd`.
-bin = "target/tianyi server run"
+bin = "target/tianyi server run --config ./tianyi.dev.yml"
 # Customize binary, can setup environment variables when run your app.
 #full_bin = "APP_ENV=dev APP_USER=air ./tmp/main"
 # Watch these filename extensions.

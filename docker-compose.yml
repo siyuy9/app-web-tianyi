@@ -3,7 +3,7 @@ version: "3.1"
 services:
     postgres:
         container_name: tianyi_postgres
-        image: postgres:alpine
+        image: postgres:14-alpine
         restart: always
         environment:
             POSTGRES_DB: tianyi
@@ -16,7 +16,7 @@ services:
 
     redis:
         container_name: tianyi_redis
-        image: redis:alpine
+        image: redis:7-alpine
         restart: always
         networks:
             - tianyi
@@ -24,7 +24,7 @@ services:
 
     nginx:
         container_name: tianyi_nginx
-        image: nginx:alpine
+        image: nginx:1.23-alpine
         volumes:
             - ./tianyi.conf:/etc/nginx/conf.d/tianyi.conf
         networks:
