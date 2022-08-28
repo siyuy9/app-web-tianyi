@@ -1,6 +1,6 @@
 package main
 
-import "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/ui/cli"
+import cli "gitlab.com/kongrentian-group/tianyi/v1/cmd"
 
 func main() {
 	cli.Execute()

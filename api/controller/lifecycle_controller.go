@@ -6,7 +6,7 @@ import (
 	usecaseLifecycle "gitlab.com/kongrentian-group/tianyi/v1/usecase/lifecycle"
 )
 
-type LifecycleController interface {
+type Lifecycle interface {
 	Migrate(context *fiber.Ctx) error
 }
 
@@ -14,9 +14,9 @@ type lifecycleController struct {
 	interactor usecaseLifecycle.Interactor
 }
 
-func NewLifecycleController(
+func NewLifecycle(
 	interactor usecaseLifecycle.Interactor,
-) LifecycleController {
+) Lifecycle {
 	return &lifecycleController{interactor: interactor}
 }
 
@@ -27,13 +27,13 @@ func NewLifecycleController(
 // @Tags database
 // @Security ApiKeyAuth
 //
-// @Success 200 {object} presenter.Success
-// @Failure 500 {object} pkg.Error
+// @Success 200 {object} presenter.SuccessModel
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/database/migrate [POST]
 func (controller *lifecycleController) Migrate(context *fiber.Ctx) error {
 	err := controller.interactor.Migrate()
 	if err != nil {
-		return err
+		return presenter.CouldNotMigrateDatabase(context, err)
 	}
-	return presenter.NewSuccess(context)
+	return presenter.SuccessDefault(context)
 }

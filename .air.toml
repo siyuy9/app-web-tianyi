@@ -13,11 +13,12 @@ cmd = """
 swag init \
     --parseDependency \
     --parseInternal \
+    --parseVendor \
     --generalInfo doc_controller.go \
     --dir api/controller \
-&& cd infrastructure/ui/web2 \
+&& cd web/ \
 && yarn build \
-&& cd ../../../ \
+&& cd ../ \
 && go build -o target/tianyi \
 """
 # Binary file yields from `cmd`.
@@ -29,8 +30,8 @@ include_ext = ["go", "tpl", "html", "js", "yml", "vue", "scss", "svg"]
 # Ignore these filename extensions or directories.
 exclude_dir = [
     "assets", "target", "vendor", "docs",
-    "infrastructure/ui/web2/node_modules",
-    "infrastructure/ui/web2/dist"
+    "web/node_modules",
+    "web/dist"
 ]
 # Watch these directories if you specified.
 include_dir = []

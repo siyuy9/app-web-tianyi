@@ -1,17 +1,15 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
+	usecaseJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
+	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 	usecaseUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
 )
 
-type UserController interface {
+type User interface {
 	GetAll(context *fiber.Ctx) error
 	Create(context *fiber.Ctx) error
 	Get(context *fiber.Ctx) error
@@ -19,15 +17,26 @@ type UserController interface {
 }
 
 type userController struct {
-	interactor usecaseUser.Interactor
+	interactor        usecaseUser.Interactor
+	jwtInteractor     usecaseJWT.Interactor
+	sessionInteractor usecaseSession.Interactor
 }
 
-// NewUserController: constructor, dependency injection from user service and firebase service
-func NewUserController(
-	userInteractor usecaseUser.Interactor,
-) UserController {
-	return &userController{interactor: userInteractor}
+// NewUser: constructor, dependency injection from user service and firebase service
+func NewUser(
+	userInteractor usecaseUser.Interactor, jwtInteractor usecaseJWT.Interactor,
+	sessionInteractor usecaseSession.Interactor,
+) User {
+	return &userController{
+		interactor: userInteractor, jwtInteractor: jwtInteractor,
+		sessionInteractor: sessionInteractor,
+	}
 }
+
+type (
+	ResponseUser  = presenter.Response[entity.User]
+	ResponseUsers = presenter.Response[entity.User]
+)
 
 // Get all users
 // @Summary get all users
@@ -36,15 +45,15 @@ func NewUserController(
 // @Tags user
 // @Security ApiKeyAuth
 //
-// @Success 200 {object} []entity.User
-// @Failure 500 {object} pkg.Error
+// @Success 200 {object} ResponseUsers
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users [GET]
 func (controller *userController) GetAll(context *fiber.Ctx) error {
 	users, err := controller.interactor.GetAll()
 	if err != nil {
-		return err
+		return presenter.CouldNotFindUser(err)
 	}
-	return context.Status(http.StatusOK).JSON(users)
+	return presenter.Success(context, users)
 }
 
 type UserRequestCreate struct {
@@ -52,8 +61,6 @@ type UserRequestCreate struct {
 	Email    string `json:"email" form:"email" validate:"required,email"`
 	Password string `json:"password" form:"password"  validate:"required,min=8,max=64"`
 }
-
-var invalidAuthError = pkg.NewErrorForbidden("invalid login or password")
 
 // Create user
 // @Summary create a user
@@ -63,9 +70,8 @@ var invalidAuthError = pkg.NewErrorForbidden("invalid login or password")
 //
 // @Param Body body UserRequestCreate true "User body"
 //
-// @Success 200 {object} entity.User
-// @Failure 500 {object} pkg.Error
-// @Failure 400 {object} pkg.Error
+// @Success 200 {object} ResponseUser
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users [POST]
 func (controller *userController) Create(context *fiber.Ctx) error {
 	request := &UserRequestCreate{}
@@ -78,9 +84,9 @@ func (controller *userController) Create(context *fiber.Ctx) error {
 		Password: request.Password,
 	}
 	if err := controller.interactor.Create(user); err != nil {
-		return err
+		return presenter.CouldNotCreateUser(err)
 	}
-	return context.Status(http.StatusOK).JSON(user)
+	return presenter.Success(context, user)
 }
 
 // get a user
@@ -92,20 +98,19 @@ func (controller *userController) Create(context *fiber.Ctx) error {
 //
 // @Param   user_id  path     string  true  "account id"
 //
-// @Success 200 {object} entity.User
-// @Failure 500 {object} pkg.Error
-// @Failure 400 {object} pkg.Error
+// @Success 200 {object} ResponseUser
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users/user/{user_id} [GET]
 func (controller *userController) Get(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("user_id"))
-	if err != nil {
-		return pkg.NewErrorBadRequest(err)
-	}
-	user, err := controller.interactor.Get(id)
+	id, err := getUserID(context)
 	if err != nil {
 		return err
 	}
-	return context.Status(fiber.StatusOK).JSON(user)
+	user, err := controller.interactor.Get(id)
+	if err != nil {
+		return presenter.CouldNotFindUser(err)
+	}
+	return presenter.Success(context, user)
 }
 
 type UserRequestLogin struct {
@@ -119,9 +124,8 @@ type UserRequestLogin struct {
 // @ID login-user
 // @Tags user
 //
-// @Success 200 {object} presenter.UserLogin
-// @Failure 500 {object} pkg.Error
-// @Failure 403 {object} pkg.Error
+// @Success 200 {object} ResponseUser
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users/login [GET]
 func (controller *userController) Login(context *fiber.Ctx) error {
 	request := &UserRequestLogin{}
@@ -130,21 +134,28 @@ func (controller *userController) Login(context *fiber.Ctx) error {
 	}
 	user, err := controller.interactor.FindByUsername(request.Username)
 	if err != nil {
-		return invalidAuthError
+		return presenter.InvalidLoginOrPassword()
 	}
 	matches, err := controller.interactor.PasswordHashCheck(
 		user,
 		request.Password,
 	)
+	if err != nil {
+		return err
+	}
 	if !matches {
-		return invalidAuthError
+		return presenter.InvalidLoginOrPassword()
 	}
+	session, err := controller.sessionInteractor.Get(context)
 	if err != nil {
-		return err
+		return presenter.CouldNotGetSession(err)
 	}
-	token, err := controller.interactor.JWT().New(user)
-	if err != nil {
-		return err
+	context.Cookie(&fiber.Cookie{
+		Name: usecaseSession.SessionCookie, Value: session.ID(),
+	})
+	session.Set(usecaseSession.UserID, user.ID.String())
+	if err := session.Save(); err != nil {
+		return presenter.CouldNotSaveSession(err)
 	}
-	return presenter.NewUserLogin(context, user, token)
+	return presenter.Success(context, user)
 }

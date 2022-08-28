@@ -17,15 +17,17 @@ import (
 	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"
 	infraJWT "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/jwt"
 	infraProject "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/project"
-	"gitlab.com/kongrentian-group/tianyi/v1/infrastructure/ui/web2"
+	web2 "gitlab.com/kongrentian-group/tianyi/v1/web"
 
 	infraBranch "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/project/branch"
+	infraSession "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/session"
 	infraUser "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/user"
 
 	usecaseApp "gitlab.com/kongrentian-group/tianyi/v1/usecase/app"
 	usecaseLifecycle "gitlab.com/kongrentian-group/tianyi/v1/usecase/lifecycle"
 	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
 	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
+	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 	usecaseUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
 )
 
@@ -36,9 +38,10 @@ var (
 )
 
 type repositories struct {
-	user    usecaseUser.Repository
-	project usecaseProject.Repository
-	branch  usecaseBranch.Repository
+	user    usecaseUser.Repository    `validate:"required"`
+	project usecaseProject.Repository `validate:"required"`
+	branch  usecaseBranch.Repository  `validate:"required"`
+	session usecaseSession.Interactor `validate:"required"`
 }
 
 type server struct {
@@ -68,10 +71,17 @@ func New(configs ...*infraConfig.App) *usecaseApp.Interactor {
 }
 
 func (server *server) Migrate() error {
-	return pkg.NewError(map[string]error{
-		"user":    server.repositories.user.Migrate(),
-		"project": server.repositories.project.Migrate(),
-	})
+	repositories := []interface{ Migrate() error }{
+		server.repositories.branch,
+		server.repositories.project,
+		server.repositories.user,
+	}
+	for _, repository := range repositories {
+		if err := repository.Migrate(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (server *server) Run() {
@@ -102,7 +112,7 @@ func (server *server) Shutdown(code int) {
 	log.Println("Shutting down...")
 	errors := []error{
 		server.router.Shutdown(),
-		server.controllers.Session.Storage.Close(),
+		server.repositories.session.Close(),
 	}
 	for _, err := range errors {
 		if err == nil {
@@ -152,6 +162,10 @@ func (server *server) SetupRepository() {
 		user:    infraUser.New(server.database),
 		project: infraProject.New(server.database),
 		branch:  infraBranch.New(server.database),
+		session: infraSession.New(server.config.Redis),
+	}
+	if err := pkg.ValidateStruct(server.repositories); err != nil {
+		panic(err)
 	}
 }
 
@@ -167,6 +181,10 @@ func (server *server) SetupInteractor() {
 		JWT:       jwt,
 		Project:   usecaseProject.New(server.repositories.project, branch),
 		Branch:    branch,
+		Session:   usecaseSession.New(server.repositories.session),
+	}
+	if err := pkg.ValidateStruct(server.interactors); err != nil {
+		panic(err)
 	}
 }
 
@@ -174,31 +192,34 @@ func (server *server) SetupController() {
 	if server.repositories == nil {
 		log.Panicln("repository is nil")
 	}
+	jwt := controller.NewJWT(server.config.Server.JWT.GetSecret())
 	server.controllers = &controller.App{
-		User: controller.NewUserController(
-			server.interactors.User,
+		User: controller.NewUser(
+			server.interactors.User, server.interactors.JWT,
+			server.interactors.Session,
 		),
-		Frontend: controller.NewFrontendController(
-			web2.FrontendFilesystem,
-			docs.SwaggerFilesystem,
+		Frontend: controller.NewFrontend(
+			web2.FrontendFilesystem, docs.SwaggerFilesystem,
 		),
-		Session: controller.NewSessionController(
-			server.config.Redis,
+		Session: controller.NewSession(
+			server.repositories.session, jwt, server.interactors.JWT,
 		),
-		Lifecycle: controller.NewLifecycleController(
+		Lifecycle: controller.NewLifecycle(
 			server.interactors.Lifecycle,
 		),
-		Project: controller.NewProjectController(
+		Project: controller.NewProject(
 			server.interactors.Project,
 		),
-		Branch: controller.NewbranchController(
-			server.interactors.Branch,
-			server.interactors.Project,
+		Branch: controller.NewBranch(
+			server.interactors.Branch, server.interactors.Project,
 		),
-		Pipeline: controller.NewPipelineController(
-			server.interactors.Branch,
-			server.interactors.Project,
+		Pipeline: controller.NewPipeline(
+			server.interactors.Branch, server.interactors.Project,
 		),
+		JWT: jwt,
+	}
+	if err := pkg.ValidateStruct(server.controllers); err != nil {
+		panic(err)
 	}
 }
 

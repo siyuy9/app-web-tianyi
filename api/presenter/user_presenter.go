@@ -1,19 +1,36 @@
 package presenter
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
-	"gitlab.com/kongrentian-group/tianyi/v1/entity"
+	"errors"
+	"fmt"
+	"net/http"
+
+	pkgError "gitlab.com/kongrentian-group/tianyi/v1/pkg/error"
 )
 
-type UserLogin struct {
-	Success
-	Token string    `json:"token"`
-	ID    uuid.UUID `json:"id"`
+func InvalidLoginOrPassword() error {
+	return pkgError.NewWithCode(
+		errors.New("invalid login or password"), http.StatusForbidden, 3,
+	)
 }
 
-func NewUserLogin(context *fiber.Ctx, user *entity.User, token string) error {
-	return context.Status(fiber.StatusOK).JSON(
-		&UserLogin{*responseSuccess, token, user.ID},
+func InvalidUserID(err error) error {
+	return pkgError.NewWithCode(
+		fmt.Errorf("invalid user id: %w", err), http.StatusBadRequest, 3,
 	)
+}
+
+func CouldNotFindUser(err error) error {
+	return pkgError.NewWithCode(
+		fmt.Errorf("could not find user(s): %w", err),
+		http.StatusNotFound, 3,
+	)
+}
+
+func CouldNotUpdateUser(err error) error {
+	return pkgError.New(fmt.Errorf("could not update user: %w", err), 3)
+}
+
+func CouldNotCreateUser(err error) error {
+	return pkgError.New(fmt.Errorf("could not create user: %w", err), 3)
 }

@@ -3,7 +3,6 @@ package infraApp
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -15,7 +14,7 @@ import (
 )
 
 func newRouter(config *fiber.Config) *fiber.App {
-	config.ErrorHandler = presenter.Error
+	config.ErrorHandler = controller.Error
 	return fiber.New(*config)
 }
 
@@ -28,21 +27,21 @@ func setupRouter(
 	// https://docs.gofiber.io/api/middleware
 	router.Use(
 		// limiter.New(),
-		cors.New(),
-		compress.New(),
+		middleware.NewCORS(),
+		compress.New(compress.Config{
+			Next:  nil,
+			Level: compress.LevelDefault,
+		}),
 		etag.New(),
-		// csrf.New(csrf.Config{CookieSameSite: "None"}),
+		// csrf.New(csrf.Config{CookieSameSite: "Strict"}),
 		logger.New(),
 		recover.New(recover.Config{EnableStackTrace: true}),
 	)
 
-	// redirect for gitlab-runners
-
 	// groups
 	// /api
-	apiRoot := router.Group(
-		"api",
-		middleware.NewJWTMiddleware(config.Server.JWT.GetSecret()),
+	apiRoot := router.Group("api",
+		middleware.NewGroup(app.Session.CheckSession),
 	)
 	// /api/v1
 	api := apiRoot.Group("v1")
@@ -53,21 +52,21 @@ func setupRouter(
 	// /api/v1/database
 	database := api.Group("database")
 	// /api/v1/projects/:project_id
-	project := projects.Group(":project_id")
+	project := projects.Group(":" + controller.PathProjectID)
 	// /api/v1/projects/:project_id/branches
 	branches := project.Group("branches")
 	// /api/v1/projects/:project_id/branches/:branch_name
-	branch := branches.Group(":branch_name")
+	branch := branches.Group(":" + controller.PathBranchName)
 	// /api/v1/projects/:project_id/branches/:branch_name/pipelines
 	pipelines := branch.Group("pipelines")
 	// /api/v1/projects/:project_id/branches/:branch_name/pipelines/:pipeline_name
-	pipeline := pipelines.Group(":pipeline_name")
+	pipeline := pipelines.Group(":" + controller.PathPipelineName)
 
 	// user routes
 	users.Get("", app.User.GetAll)
 	users.Post("", app.User.Create)
 	users.Post("login", app.User.Login)
-	users.Get("user/:user_id", app.User.Get)
+	users.Get("user/:"+controller.PathUserID, app.User.Get)
 
 	// project routes
 	projects.Get("", app.Project.Get)

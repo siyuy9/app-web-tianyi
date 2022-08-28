@@ -1,6 +1,7 @@
 package infraJWT
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -33,12 +34,26 @@ func (interactor *jwtInteractor) New(user *entity.User) (string, error) {
 	return token.SignedString(interactor.secret)
 }
 
-func (interactor *jwtInteractor) GetClaims(token map[string]interface{}) (
+func (interactor *jwtInteractor) GetClaims(token interface{}) (
 	*entity.JWTClaims, error,
 ) {
+	if token == nil {
+		return nil, fmt.Errorf("JWT is nil")
+	}
+	tokenAsserted, ok := token.(*jwt.Token)
+	if !ok {
+		return nil, fmt.Errorf(
+			"cannot get claims, invalid token: %v", token,
+		)
+	}
+	claimsMap, ok := tokenAsserted.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf(
+			"cannot get claims, invalid claim map: %v", tokenAsserted.Claims,
+		)
+	}
 	claims := &entity.JWTClaims{}
-	err := mapstructure.Decode(token, claims)
-	if err != nil {
+	if err := mapstructure.Decode(token, claimsMap); err != nil {
 		return nil, err
 	}
 	return claims, pkg.ValidateStruct(claims)

@@ -6,14 +6,13 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
+	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
 	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
 	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
 )
 
-type PipelineController interface {
+type Pipeline interface {
 	Create(context *fiber.Ctx) error
 }
 
@@ -22,15 +21,19 @@ type pipelineController struct {
 	projectInteractor usecaseProject.Interactor
 }
 
-func NewPipelineController(
+func NewPipeline(
 	branchInteractor usecaseBranch.Interactor,
 	projectInteractor usecaseProject.Interactor,
-) PipelineController {
+) Pipeline {
 	return &pipelineController{
 		branchInteractor:  branchInteractor,
 		projectInteractor: projectInteractor,
 	}
 }
+
+type (
+	ResponsePipeline = presenter.Response[entity.PipelineConfig]
+)
 
 // create a pipeline
 // @Summary create a pipeline
@@ -43,22 +46,21 @@ func NewPipelineController(
 // @Param   branch_name  path     string  true  "branch name"
 // @Param   pipeline_name  path     string  true  "pipeline name"
 //
-// @Success 200
-// @Failure 500 {object} pkg.Error
-// @Failure 400 {object} pkg.Error
+// @Success 200 {object} map[string]any
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id}/branches/{branch_name}/pipelines/{pipeline_name} [POST]
 func (controller *pipelineController) Create(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("project_id"))
+	id, err := getProjectID(context)
 	if err != nil {
-		return pkg.NewErrorBadRequest(err)
+		return err
 	}
-	name := context.Params("branch_name")
-	if name == "" {
-		return pkg.NewErrorBadRequest("name is empty")
+	name, err := getBranchName(context)
+	if err != nil {
+		return err
 	}
 	branch, err := controller.branchInteractor.GetProjectBranch(id, name)
 	if err != nil {
-		return err
+		return presenter.CouldNotFindProjectBranch(err)
 	}
 	for _, pipeline := range branch.Config.Pipelines {
 		if pipeline.Name != context.Params("pipeline_name") {

@@ -33,13 +33,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/presenter.Success"
+                            "$ref": "#/definitions/presenter.SuccessModel"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -70,16 +70,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Project"
-                            }
+                            "$ref": "#/definitions/controller.ResponseProjects"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -111,19 +108,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Project"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseProject"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -155,19 +146,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Project"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseProject"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -206,19 +191,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Project"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseProject"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -250,16 +229,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Branch"
-                            }
+                            "$ref": "#/definitions/controller.ResponseBranches"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -298,19 +274,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Branch"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseBranch"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -349,19 +319,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Branch"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseBranch"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -398,19 +362,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Branch"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseBranch"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -454,18 +412,46 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/swagger/swagger.json": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get the current OpenAPI schema",
+                "tags": [
+                    "openapi"
+                ],
+                "summary": "get the current OpenAPI schema",
+                "operationId": "get-openapi",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -488,16 +474,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.User"
-                            }
+                            "$ref": "#/definitions/controller.ResponseUsers"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -524,19 +507,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseUser"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -554,19 +531,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/presenter.UserLogin"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseUser"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -598,19 +569,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/controller.ResponseUser"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/pkg.Error"
+                            "$ref": "#/definitions/presenter.ResponseError"
                         }
                     }
                 }
@@ -648,6 +613,24 @@ const docTemplate = `{
                     "minLength": 3
                 }
             }
+        },
+        "controller.ResponseBranch": {
+            "type": "object"
+        },
+        "controller.ResponseBranches": {
+            "type": "object"
+        },
+        "controller.ResponseProject": {
+            "type": "object"
+        },
+        "controller.ResponseProjects": {
+            "type": "object"
+        },
+        "controller.ResponseUser": {
+            "type": "object"
+        },
+        "controller.ResponseUsers": {
+            "type": "object"
         },
         "controller.UserRequestCreate": {
             "type": "object",
@@ -696,72 +679,6 @@ const docTemplate = `{
                     "minLength": 1
                 },
                 "project_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Capability": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 256,
-                    "minLength": 3
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Permission": {
-            "type": "object",
-            "required": [
-                "name",
-                "path"
-            ],
-            "properties": {
-                "capabilities": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Capability"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 256,
-                    "minLength": 3
-                },
-                "path": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -880,127 +797,18 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.Role": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 256,
-                    "minLength": 3
-                },
-                "permissions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Permission"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.User": {
-            "type": "object",
-            "required": [
-                "email",
-                "username"
-            ],
-            "properties": {
-                "admin": {
-                    "type": "boolean"
-                },
-                "bio": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "roles": {
-                    "description": "\"many to many\" association\nhttps://gorm.io/docs/many_to_many.html",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Role"
-                    }
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "pkg.Error": {
+        "presenter.ResponseError": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer",
-                    "example": 500
-                },
-                "errors": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "status": {
-                    "type": "string",
-                    "example": "fail"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "*fiber.Error"
-                }
+                "error": {}
             }
         },
-        "presenter.Success": {
+        "presenter.SuccessModel": {
             "type": "object",
             "properties": {
                 "status": {
                     "type": "string",
                     "example": "success"
-                }
-            }
-        },
-        "presenter.UserLogin": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "success"
-                },
-                "token": {
-                    "type": "string"
                 }
             }
         },

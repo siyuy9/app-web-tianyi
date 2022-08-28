@@ -20,6 +20,18 @@ definitions:
     required:
     - name
     type: object
+  controller.ResponseBranch:
+    type: object
+  controller.ResponseBranches:
+    type: object
+  controller.ResponseProject:
+    type: object
+  controller.ResponseProjects:
+    type: object
+  controller.ResponseUser:
+    type: object
+  controller.ResponseUsers:
+    type: object
   controller.UserRequestCreate:
     properties:
       email:
@@ -57,51 +69,6 @@ definitions:
         type: string
     required:
     - name
-    type: object
-  entity.Capability:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/sql.NullTime'
-      description:
-        type: string
-      id:
-        type: string
-      name:
-        maxLength: 256
-        minLength: 3
-        type: string
-      updated_at:
-        type: string
-    required:
-    - name
-    type: object
-  entity.Permission:
-    properties:
-      capabilities:
-        items:
-          $ref: '#/definitions/entity.Capability'
-        type: array
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/sql.NullTime'
-      description:
-        type: string
-      id:
-        type: string
-      name:
-        maxLength: 256
-        minLength: 3
-        type: string
-      path:
-        type: string
-      updated_at:
-        type: string
-    required:
-    - name
-    - path
     type: object
   entity.PipelineConfig:
     properties:
@@ -178,90 +145,14 @@ definitions:
     - name
     - source
     type: object
-  entity.Role:
+  presenter.ResponseError:
     properties:
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/sql.NullTime'
-      description:
-        type: string
-      id:
-        type: string
-      name:
-        maxLength: 256
-        minLength: 3
-        type: string
-      permissions:
-        items:
-          $ref: '#/definitions/entity.Permission'
-        type: array
-      updated_at:
-        type: string
-    required:
-    - name
+      error: {}
     type: object
-  entity.User:
-    properties:
-      admin:
-        type: boolean
-      bio:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/sql.NullTime'
-      email:
-        type: string
-      id:
-        type: string
-      image:
-        type: string
-      roles:
-        description: |-
-          "many to many" association
-          https://gorm.io/docs/many_to_many.html
-        items:
-          $ref: '#/definitions/entity.Role'
-        type: array
-      updated_at:
-        type: string
-      username:
-        type: string
-    required:
-    - email
-    - username
-    type: object
-  pkg.Error:
-    properties:
-      code:
-        example: 500
-        type: integer
-      errors:
-        additionalProperties:
-          type: string
-        type: object
-      status:
-        example: fail
-        type: string
-      type:
-        example: '*fiber.Error'
-        type: string
-    type: object
-  presenter.Success:
+  presenter.SuccessModel:
     properties:
       status:
         example: success
-        type: string
-    type: object
-  presenter.UserLogin:
-    properties:
-      id:
-        type: string
-      status:
-        example: success
-        type: string
-      token:
         type: string
     type: object
   sql.NullTime:
@@ -283,11 +174,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/presenter.Success'
+            $ref: '#/definitions/presenter.SuccessModel'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: migrate databases
@@ -306,13 +197,11 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entity.Project'
-            type: array
+            $ref: '#/definitions/controller.ResponseProjects'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: get projects
@@ -332,15 +221,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Project'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseProject'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: create a project
@@ -360,15 +245,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Project'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseProject'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: get a project
@@ -393,15 +274,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Project'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseProject'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: update a project
@@ -421,13 +298,11 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entity.Branch'
-            type: array
+            $ref: '#/definitions/controller.ResponseBranches'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: get all project branches
@@ -452,15 +327,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Branch'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseBranch'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: create a branch
@@ -485,15 +356,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Branch'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseBranch'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: get a project branch
@@ -517,15 +384,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Branch'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseBranch'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: update a branch
@@ -554,19 +417,37 @@ paths:
       responses:
         "200":
           description: OK
-        "400":
-          description: Bad Request
           schema:
-            $ref: '#/definitions/pkg.Error'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: create a pipeline
       tags:
       - pipeline
+  /api/v1/swagger/swagger.json:
+    put:
+      description: get the current OpenAPI schema
+      operationId: get-openapi
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presenter.ResponseError'
+      security:
+      - ApiKeyAuth: []
+      summary: get the current OpenAPI schema
+      tags:
+      - openapi
   /api/v1/users:
     get:
       description: get all users
@@ -575,13 +456,11 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entity.User'
-            type: array
+            $ref: '#/definitions/controller.ResponseUsers'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: get all users
@@ -601,15 +480,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseUser'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       summary: create a user
       tags:
       - user
@@ -621,15 +496,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/presenter.UserLogin'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseUser'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       summary: login
       tags:
       - user
@@ -647,15 +518,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.User'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/controller.ResponseUser'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/pkg.Error'
+            $ref: '#/definitions/presenter.ResponseError'
       security:
       - ApiKeyAuth: []
       summary: get a user

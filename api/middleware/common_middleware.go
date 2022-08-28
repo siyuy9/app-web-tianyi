@@ -7,7 +7,7 @@ import "github.com/gofiber/fiber/v2"
 // "Group handlers can also be used as a routing path but they must have
 // Next added to them so that the flow can continue."
 // https://docs.gofiber.io/guide/grouping#group-handlers
-func NewGroupMiddleware(
+func NewGroup(
 	middleware func(*fiber.Ctx) error,
 ) func(*fiber.Ctx) error {
 	return func(context *fiber.Ctx) error {

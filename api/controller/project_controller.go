@@ -1,30 +1,32 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 
+	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
 	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
 )
 
-type ProjectController interface {
+type Project interface {
 	GetByID(context *fiber.Ctx) error
 	Get(context *fiber.Ctx) error
 	Create(context *fiber.Ctx) error
 	Update(context *fiber.Ctx) error
 }
 
+type (
+	ResponseProject  = presenter.Response[entity.Project]
+	ResponseProjects = presenter.Response[[]entity.Project]
+)
+
 type projectController struct {
 	interactor usecaseProject.Interactor
 }
 
-func NewProjectController(
+func NewProject(
 	projectInteractor usecaseProject.Interactor,
-) ProjectController {
+) Project {
 	return &projectController{interactor: projectInteractor}
 }
 
@@ -37,20 +39,19 @@ func NewProjectController(
 //
 // @Param   project_id  path     int  true  "project id"
 //
-// @Success 200 {object} entity.Project
-// @Failure 500 {object} pkg.Error
-// @Failure 400 {object} pkg.Error
+// @Success 200 {object} ResponseProject
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id} [GET]
 func (controller *projectController) GetByID(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("project_id"))
-	if err != nil {
-		return pkg.NewErrorBadRequest(err)
-	}
-	project, err := controller.interactor.Get(id)
+	id, err := getProjectID(context)
 	if err != nil {
 		return err
 	}
-	return context.Status(http.StatusOK).JSON(project)
+	project, err := controller.interactor.Get(id)
+	if err != nil {
+		return presenter.CouldNotFindProject(err)
+	}
+	return presenter.Success(context, project)
 }
 
 // get projects
@@ -62,23 +63,23 @@ func (controller *projectController) GetByID(context *fiber.Ctx) error {
 //
 // @Param        path    query     string  false  "search by path"
 //
-// @Success 200 {object} []entity.Project
-// @Failure 500 {object} pkg.Error
+// @Success 200 {object} ResponseProjects
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects [GET]
 func (controller *projectController) Get(context *fiber.Ctx) error {
 	path := context.Query("path")
 	if path == "" {
 		projects, err := controller.interactor.GetAll()
 		if err != nil {
-			return err
+			return presenter.CouldNotFindProject(err)
 		}
-		return context.Status(http.StatusOK).JSON(projects)
+		return presenter.Success(context, projects)
 	}
 	project, err := controller.interactor.GetByPath(path)
 	if err != nil {
-		return err
+		return presenter.CouldNotFindProject(err)
 	}
-	return context.Status(http.StatusOK).JSON([]entity.Project{*project})
+	return presenter.Success(context, []entity.Project{*project})
 }
 
 type ProjectRequestCreate struct {
@@ -96,9 +97,8 @@ type ProjectRequestCreate struct {
 //
 // @Param Body body ProjectRequestCreate true "Project body"
 //
-// @Success 200 {object} entity.Project
-// @Failure 500 {object} pkg.Error
-// @Failure 400 {object} pkg.Error
+// @Success 200 {object} ResponseProject
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects [POST]
 func (controller *projectController) Create(context *fiber.Ctx) error {
 	request := &ProjectRequestCreate{}
@@ -111,9 +111,9 @@ func (controller *projectController) Create(context *fiber.Ctx) error {
 		DefaultBranch: request.DefaultBranch,
 	}
 	if err := controller.interactor.Create(project); err != nil {
-		return err
+		return presenter.CouldNotCreateProject(err)
 	}
-	return context.Status(http.StatusOK).JSON(project)
+	return presenter.Success(context, project)
 }
 
 // update a project
@@ -126,14 +126,13 @@ func (controller *projectController) Create(context *fiber.Ctx) error {
 // @Param   project_id  path     string  true  "project id"
 // @Param Body body entity.Project true "Project body"
 //
-// @Success 200 {object} entity.Project
-// @Failure 500 {object} pkg.Error
-// @Failure 400 {object} pkg.Error
+// @Success 200 {object} ResponseProject
+// @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id} [PUT]
 func (controller *projectController) Update(context *fiber.Ctx) error {
-	id, err := uuid.Parse(context.Params("project_id"))
+	id, err := getProjectID(context)
 	if err != nil {
-		return pkg.NewErrorBadRequest(err)
+		return err
 	}
 	project := &entity.Project{}
 	if err = parse(context, project); err != nil {
@@ -141,7 +140,7 @@ func (controller *projectController) Update(context *fiber.Ctx) error {
 	}
 	project.ID = id
 	if err = controller.interactor.Update(project); err != nil {
-		return err
+		return presenter.CouldNotUpdateProject(err)
 	}
-	return context.Status(http.StatusOK).JSON(project)
+	return presenter.Success(context, project)
 }
