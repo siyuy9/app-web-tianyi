@@ -30,7 +30,7 @@ services:
         container_name: tianyi_nginx
         image: nginx:alpine
         volumes:
-            - ./tianyi.conf:/etc/nginx/conf.d/
+            - ./tianyi.conf:/etc/nginx/conf.d/tianyi.conf
         networks:
             - tianyi
         ports:
@@ -40,7 +40,7 @@ services:
         container_name: tianyi_server
         image: kongrentian/tianyi:${CI_COMMIT_REF_NAME}
         volumes:
-            - ./tianyi.yml:/app/
+            - ./tianyi.yml:/app/tianyi.yml
         networks:
             - tianyi
 networks:
