@@ -14,7 +14,7 @@ release:
     tags: [trigger]
     variables: { tag: "kongrentian/tianyi:${CI_COMMIT_REF_NAME}" }
     script:
-        - docker build -t "${tag}"
+        - docker build . -t "${tag}"
         - docker push "${tag}"
 
 deploy:
