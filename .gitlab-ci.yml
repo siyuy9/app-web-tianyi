@@ -20,5 +20,7 @@ release:
 deploy:
     stage: deploy
     tags: [trigger]
+    variables:
+        PATH: ${PATH}:/usr/libexec/docker/cli-plugins
     script:
         - docker-compose up -d
