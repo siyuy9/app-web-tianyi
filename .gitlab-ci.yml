@@ -20,7 +20,6 @@ release:
 deploy:
     stage: deploy
     tags: [trigger]
-    variables:
-        PATH: ${PATH}:/usr/libexec/docker/cli-plugins
     script:
+        - export PATH="${PATH}:/usr/libexec/docker/cli-plugins"
         - docker-compose up -d
