@@ -22,6 +22,14 @@ services:
             - tianyi
         command: redis-server --requirepass "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
 
+    tianyi:
+        container_name: tianyi_server
+        image: kongrentian/tianyi:${CI_COMMIT_REF_NAME}
+        volumes:
+            - ./tianyi.yml:/app/tianyi.yml
+        networks:
+            - tianyi
+
     nginx:
         container_name: tianyi_nginx
         image: nginx:1.23-alpine
@@ -30,16 +38,9 @@ services:
         networks:
             - tianyi
         ports:
-            - "443:443"
-            - "6379:6379"
             - "5432:5432"
+            - "6379:6379"
+            - "443:443"
 
-    tianyi:
-        container_name: tianyi_server
-        image: kongrentian/tianyi:${CI_COMMIT_REF_NAME}
-        volumes:
-            - ./tianyi.yml:/app/tianyi.yml
-        networks:
-            - tianyi
 networks:
     tianyi:
