@@ -8,6 +8,8 @@ import (
 )
 
 func Error(context *fiber.Ctx, err pkgError.Error) error {
-	log.Println("ERROR", err)
-	return context.Status(err.StatusCode()).JSON(&ResponseError{Error: err})
+	log.Println(pkgError.Stacktrace(err))
+	return context.Status(err.StatusCode()).JSON(
+		&ResponseError{Error: err.Error()},
+	)
 }

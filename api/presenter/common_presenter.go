@@ -13,7 +13,7 @@ type Response[Template any] struct {
 }
 
 type ResponseError struct {
-	Error error `json:"error"`
+	Error string `json:"error"`
 }
 
 type SuccessModel struct {

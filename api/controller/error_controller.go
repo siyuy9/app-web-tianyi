@@ -27,7 +27,7 @@ func Error(context *fiber.Ctx, err error) error {
 	// in case a serialization error occurs
 	return presenter.Error(
 		context,
-		pkgError.New(
+		pkgError.NewWithCode(
 			fmt.Errorf(
 				"could not serialize error %#v: %w", errNormalized, err,
 			),
