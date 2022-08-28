@@ -28,10 +28,7 @@ func setupRouter(
 	router.Use(
 		// limiter.New(),
 		middleware.NewCORS(),
-		compress.New(compress.Config{
-			Next:  nil,
-			Level: compress.LevelDefault,
-		}),
+		compress.New(),
 		etag.New(),
 		// csrf.New(csrf.Config{CookieSameSite: "Strict"}),
 		logger.New(),

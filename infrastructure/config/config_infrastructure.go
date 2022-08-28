@@ -146,7 +146,6 @@ func (app *App) Populate() *App {
 		log.Fatalf("could not read config file: %v", err)
 	}
 	configPath := viper.ConfigFileUsed()
-	log.Println(viper.AllSettings())
 	if err := viper.UnmarshalExact(app); err != nil {
 		log.Fatalf(
 			"could not unmarshal config file '%s': %v",

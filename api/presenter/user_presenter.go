@@ -14,6 +14,13 @@ func InvalidLoginOrPassword() error {
 	)
 }
 
+func CouldNotParsePasswordHash(err error) error {
+	return pkgError.NewWithCode(
+		fmt.Errorf("could not parse password hash: %w", err),
+		http.StatusInternalServerError, 3,
+	)
+}
+
 func InvalidUserID(err error) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf("invalid user id: %w", err), http.StatusBadRequest, 3,

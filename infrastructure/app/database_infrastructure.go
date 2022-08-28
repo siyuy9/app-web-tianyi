@@ -42,7 +42,7 @@ func connectDatabase(config *infraConfig.Database) *gorm.DB {
 			Logger: databaseLogger,
 		})
 	if err != nil {
-		log.Panic("Failed to connect to database: ", err)
+		log.Fatalf("failed to connect to database")
 	}
 	return database
 }
