@@ -130,6 +130,7 @@ func (app *App) Populate() *App {
 			filepath.Join(homeDirectory, "tianyi"),
 			filepath.Join(configDirectory, "tianyi"),
 			filepath.Join(cacheDirectory, "tianyi"),
+			"/opt/tianyi",
 		}
 		for _, path := range paths {
 			viper.AddConfigPath(path)

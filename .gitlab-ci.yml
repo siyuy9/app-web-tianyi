@@ -1,11 +1,22 @@
 stages:
-    - stage
+    - trigger
+    - release
+    - deploy
 
 trigger:
-    stage: stage
-    tags:
-        - trigger
-    only:
-        - triggers
+    stage: trigger
+    tags: [trigger]
+    only: [triggers]
+    script: [date]
+
+release:
+    stage: release
+    variables: { tag: "kongrentian/tianyi:${CI_COMMIT_REF_NAME}" }
     script:
-        - date
+        - docker build -t "${tag}"
+        - docker push "${tag}"
+
+deploy:
+    stage: deploy
+    script:
+        - docker-compose up -d
