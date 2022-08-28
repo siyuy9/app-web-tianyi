@@ -800,7 +800,9 @@ const docTemplate = `{
         "presenter.ResponseError": {
             "type": "object",
             "properties": {
-                "error": {}
+                "error": {
+                    "type": "string"
+                }
             }
         },
         "presenter.SuccessModel": {
