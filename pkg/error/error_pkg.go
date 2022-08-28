@@ -22,7 +22,6 @@ type Error interface {
 	// generates stacktrace of itself and all wrapped errors when called
 	Error() string
 	HasFrame
-	fmt.Formatter
 	// returns regular error string
 	ErrorWithoutStacktrace() string
 }
