@@ -1,7 +1,7 @@
 FROM golang:1.19 as base
 WORKDIR "/src"
 COPY . .
-RUN CGO_ENABLED=0 go build -o app
+RUN cd web && yard build && CGO_ENABLED=0 go build -o app
 
 FROM alpine:latest as final
 WORKDIR /app
