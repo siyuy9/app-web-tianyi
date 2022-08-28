@@ -7,6 +7,6 @@ import (
 
 func Error(context *fiber.Ctx, err pkgError.Error) error {
 	return context.Status(err.StatusCode()).JSON(
-		&ResponseError{Error: err.ErrorWithoutStacktrace()},
+		&ResponseError{Error: err.Error()},
 	)
 }

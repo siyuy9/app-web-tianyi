@@ -11,6 +11,6 @@ import (
 func CouldNotFincPileline(context *fiber.Ctx, err error) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf("could not find project pipeline(s): %w", err),
-		http.StatusNotFound, 3,
+		http.StatusNotFound,
 	)
 }

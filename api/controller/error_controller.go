@@ -2,7 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
@@ -24,6 +26,7 @@ func Error(context *fiber.Ctx, err error) error {
 	if err == nil {
 		return nil
 	}
+	log.Println(context.Route().Path, debug.Stack())
 	// in case a serialization error occurs
 	return presenter.Error(
 		context,

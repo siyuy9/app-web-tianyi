@@ -9,20 +9,20 @@ import (
 
 func InvalidBranchName(err error) error {
 	return pkgError.NewWithCode(
-		fmt.Errorf("invalid branch name: %w", err), http.StatusBadRequest, 3,
+		fmt.Errorf("invalid branch name: %w", err), http.StatusBadRequest,
 	)
 }
 
 func CouldNotFindProjectBranch(err error) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf("could not find project branch(es): %w", err),
-		http.StatusNotFound, 3,
+		http.StatusNotFound,
 	)
 }
 
 func CouldNotCreateProjectBranch(err error) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf("could not find create branch: %w", err),
-		http.StatusNotFound, 3,
+		http.StatusNotFound,
 	)
 }

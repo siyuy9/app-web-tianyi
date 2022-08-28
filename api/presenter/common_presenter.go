@@ -39,14 +39,14 @@ func SuccessDefault(context *fiber.Ctx, code ...int) error {
 func InvalidRequestBodyFormat(err error) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf("invalid request body format: %w", err),
-		http.StatusBadRequest, 3,
+		http.StatusBadRequest,
 	)
 }
 
 func InvalidRequestBodyContent(err error) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf("invalid request body content: %w", err),
-		http.StatusBadRequest, 3,
+		http.StatusBadRequest,
 	)
 }
 
@@ -56,6 +56,6 @@ func RouteDoesNotExist(context *fiber.Ctx) error {
 			"route '%s %s' does not exist",
 			context.Method(), context.OriginalURL(),
 		),
-		http.StatusNotFound, 3,
+		http.StatusNotFound,
 	)
 }
