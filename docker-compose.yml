@@ -29,6 +29,9 @@ services:
             - ./tianyi.yml:/app/tianyi.yml
         networks:
             - tianyi
+        depends_on:
+            - postgres
+            - redis
 
     nginx:
         container_name: tianyi_nginx

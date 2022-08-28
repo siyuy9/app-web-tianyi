@@ -134,7 +134,7 @@ func (controller *userController) Login(context *fiber.Ctx) error {
 	}
 	user, err := controller.interactor.FindByUsername(request.Username)
 	if err != nil {
-		return presenter.CouldNotFindUser(err)
+		return presenter.InvalidLoginOrPassword()
 	}
 	matches, err := controller.interactor.PasswordHashCheck(
 		user,
