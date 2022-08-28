@@ -2,12 +2,12 @@ FROM node:18 as web
 WORKDIR /src
 COPY . .
 RUN cd web && yarn install
-RUN yarn build
+RUN cd web && yarn build
 
 FROM golang:1.19 as build
 WORKDIR /src
 COPY . .
-COPY --from=web /src/web/dist web/
+COPY --from=web web/dist web/
 RUN CGO_ENABLED=0 go build -o app
 
 FROM alpine:3.16 as final
