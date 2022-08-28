@@ -19,15 +19,18 @@ const actions = {
   clean({ commit }) {
     commit("user", {});
   },
-  async login({ commit, dispatch }, auth) {
-    const response = await axios.post("/api/v1/users/login", {
-      username: auth.username,
-      password: auth.password,
-    });
-    commit("user", response.data.data);
-    if (auth.remember_me) {
-      dispatch("persist");
-    }
+  login({ commit, dispatch }, auth) {
+    return axios
+      .post("/api/v1/users/login", {
+        username: auth.username,
+        password: auth.password,
+      })
+      .then((response) => {
+        commit("user", response.data.data);
+        if (auth.remember_me) {
+          dispatch("persist");
+        }
+      });
   },
   initializeStore({ commit }) {
     var user = localStorage.getItem("user");
