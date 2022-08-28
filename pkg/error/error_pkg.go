@@ -22,6 +22,7 @@ type Error interface {
 	// generates stacktrace of itself and all wrapped errors when called
 	Error() string
 	HasFrame
+	fmt.Formatter
 	// returns regular error string
 	ErrorWithoutStacktrace() string
 }
@@ -57,11 +58,7 @@ func (customError *customError) Error() string {
 }
 
 func (customError *customError) ErrorWithoutStacktrace() string {
-	assertedError, ok := customError.err.(Error)
-	if !ok {
-		return customError.err.Error()
-	}
-	return assertedError.ErrorWithoutStacktrace()
+	return ErrorWithoutStacktrace(customError)
 }
 
 func (customError *customError) Unwrap() error {
@@ -74,6 +71,14 @@ func (customError *customError) Frame() *runtime.Frame {
 
 func (customError *customError) StatusCode() int {
 	return customError.statusCode
+}
+
+// if it is Error, call ErrorWithoutStacktrace, otherwise just call Error
+func ErrorWithoutStacktrace(err error) string {
+	if assertedError, ok := err.(Error); ok {
+		return assertedError.ErrorWithoutStacktrace()
+	}
+	return err.Error()
 }
 
 // return stacktrace
@@ -89,13 +94,9 @@ func Stacktrace(err error) string {
 }
 
 func putStacktrace(err error, buffer *bytes.Buffer) {
-	fmt.Fprintf(buffer, "%v", err)
-	withFrame, ok := err.(HasFrame)
-	var frame *runtime.Frame
-	if ok {
-		frame = withFrame.Frame()
-	}
-	if frame != nil {
+	fmt.Fprintf(buffer, "%s", ErrorWithoutStacktrace(err))
+	if withFrame, ok := err.(HasFrame); ok {
+		frame := withFrame.Frame()
 		fmt.Fprintf(buffer, "\n    %s:%d", frame.File, frame.Line)
 	}
 	fmt.Fprint(buffer, "\n")
