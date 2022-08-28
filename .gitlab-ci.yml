@@ -22,4 +22,4 @@ deploy:
     tags: [trigger]
     script:
         - export PATH="${PATH}:/usr/libexec/docker/cli-plugins"
-        - docker-compose up -d
+        - docker-compose up -d --remove-orphans
