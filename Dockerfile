@@ -1,7 +1,7 @@
 FROM node:latest as web
 WORKDIR /src
 COPY . .
-RUN cd web && yarn build
+RUN cd web && yarn install && yarn build
 
 FROM golang:1.19 as base
 WORKDIR /src
