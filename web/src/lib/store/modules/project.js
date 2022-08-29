@@ -64,45 +64,69 @@ const mutations = {
 };
 
 const actions = {
-  async loadProject({ commit }, path) {
-    const projectResponse = await axios.get("/api/v1/projects", {
-      params: {
-        path: path,
-      },
-    });
-    var project = projectResponse.data.data[0];
-    commit("updateProject", { projectID: project.id, project_data: project });
-    commit("currentID", project.id);
-  },
-  async loadBranch({ commit, getters }, branchName) {
-    const branchResponse = await axios.get(
-      `/api/v1/projects/${getters.currentID}/branches/${branchName}`
+  loadProject({ commit }, path) {
+    return new Promise((resolve, reject) =>
+      axios
+        .get("/api/v1/projects", {
+          params: {
+            path: path,
+          },
+        })
+        .then((response) => {
+          var project = response.data.data[0];
+          commit("updateProject", {
+            projectID: project.id,
+            project_data: project,
+          });
+          commit("currentID", project.id);
+          resolve(response);
+        })
+        .catch(reject)
     );
-    commit("updateBranch", {
-      projectID: getters.currentID,
-      branchName: branchName,
-      branchData: branchResponse.data.data,
-    });
   },
-  async updateRemoteBranch({ commit, getters }, branchName) {
-    const branchResponse = axios.put(
-      `/api/v1/projects/${getters.currentID}/branches/${branchName}`
+  loadBranch({ commit, getters }, branchName) {
+    return new Promise((resolve, reject) =>
+      axios
+        .get(`/api/v1/projects/${getters.currentID}/branches/${branchName}`)
+        .then((response) => {
+          commit("updateBranch", {
+            projectID: getters.currentID,
+            branchName: branchName,
+            branchData: response.data.data,
+          });
+          resolve(response);
+        })
+        .catch(reject)
     );
-    commit("updateBranch", {
-      projectID: getters.currentID,
-      branchName: branchName,
-      branchData: branchResponse.data.data,
-    });
   },
-  async loadBranches({ commit, getters }) {
-    const branchResponse = await axios.get(
-      `/api/v1/projects/${getters.currentID}/branches`
+  updateRemoteBranch({ commit, getters }, branchName) {
+    return new Promise((resolve, reject) =>
+      axios
+        .put(`/api/v1/projects/${getters.currentID}/branches/${branchName}`)
+        .then((response) => {
+          commit("updateBranch", {
+            projectID: getters.currentID,
+            branchName: branchName,
+            branchData: response.data.data,
+          });
+          resolve(response);
+        })
+        .catch(reject)
     );
-    commit("updateBranches", {
-      projectID: getters.currentID,
-      branches: branchResponse.data.data,
-    });
-    return branchResponse.data.data;
+  },
+  loadBranches({ commit, getters }) {
+    return new Promise((resolve, reject) =>
+      axios
+        .get(`/api/v1/projects/${getters.currentID}/branches`)
+        .then((response) => {
+          commit("updateBranches", {
+            projectID: getters.currentID,
+            branches: response.data.data,
+          });
+          resolve(response);
+        })
+        .catch(reject)
+    );
   },
 };
 const getters = {

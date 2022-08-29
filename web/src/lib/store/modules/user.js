@@ -33,7 +33,7 @@ const actions = {
           }
           resolve(response);
         })
-        .catch(reject)
+        .catch((error) => reject(error))
     );
   },
   initializeStore({ commit }) {
