@@ -10,7 +10,7 @@ services:
             POSTGRES_USER: admin
             POSTGRES_PASSWORD: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
         volumes:
-            - ./infrastructure/app:/docker-entrypoint-initdb.d:ro
+            - ./:/docker-entrypoint-initdb.d:ro
         networks:
             - tianyi
         ports:

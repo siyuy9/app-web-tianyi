@@ -25,7 +25,7 @@ deploy:
     script:
         - export PATH="${PATH}:/usr/libexec/docker/cli-plugins"
         - test -d "${APP_DIR}" || exit 1
-        - cp *.yml *.conf "${APP_DIR}/"
+        - cp *.yml *.conf infrastructure/app/*.sql "${APP_DIR}/"
         - cd "${APP_DIR}"
         - docker-compose up -d
         - docker-compose restart
