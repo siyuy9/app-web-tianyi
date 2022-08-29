@@ -44,7 +44,7 @@ services:
             - tianyi
         ports:
             - "6379:6379"
-            - "443:443"
+            - "443:8080"
 
 networks:
     tianyi:
