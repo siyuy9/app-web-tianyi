@@ -13,8 +13,6 @@ services:
             - ./infrastructure/app:/docker-entrypoint-initdb.d:ro
         networks:
             - tianyi
-        ports:
-            - "5432:5432"
 
     redis:
         container_name: tianyi_redis
@@ -45,6 +43,7 @@ services:
         ports:
             - "6379:6379"
             - "443:8080"
+            - "5432:5432"
 
 networks:
     tianyi:
