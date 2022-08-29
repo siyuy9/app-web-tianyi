@@ -147,10 +147,7 @@ export default {
           remember_me: this.remember_me,
         })
         .then(() => this.$router.push({ name: "root" }))
-        .catch((error) => {
-          console.log("catching", error);
-          Error(error);
-        })
+        .catch(Error)
         .finally(() => (this.submitted = false));
     },
   },

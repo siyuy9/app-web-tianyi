@@ -15,12 +15,10 @@ export default async function AddErrorMessages(error, toast) {
     });
     return;
   }
-  for (var [key, value] of Object.entries(error.response.data.errors)) {
-    send({
-      severity: "error",
-      summary: error.message,
-      detail: key === "body" ? value : `${key}: ${value}`,
-      life: 5000,
-    });
-  }
+  send({
+    severity: "error",
+    summary: error.message,
+    detail: error.response.data.error,
+    life: 5000,
+  });
 }
