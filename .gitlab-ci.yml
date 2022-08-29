@@ -28,3 +28,4 @@ deploy:
         - cp *.yml *.conf "${APP_DIR}"
         - cd "${APP_DIR}"
         - docker-compose up -d
+        - docker-compose restart
