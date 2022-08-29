@@ -10,7 +10,7 @@ services:
             POSTGRES_USER: admin
             POSTGRES_PASSWORD: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
         volumes:
-            - ./infrastructure/app/database_extensions.sql:/docker-entrypoint-initdb.d/database_extensions.sql
+            - ./infrastructure/app:/docker-entrypoint-initdb.d:ro
         networks:
             - tianyi
 
@@ -26,7 +26,7 @@ services:
         container_name: tianyi_server
         image: kongrentian/tianyi:${CI_COMMIT_REF_NAME}
         volumes:
-            - ./tianyi.yml:/app/tianyi.yml
+            - ./tianyi.yml:/app/tianyi.yml:ro
         networks:
             - tianyi
         depends_on:
@@ -37,7 +37,7 @@ services:
         container_name: tianyi_nginx
         image: nginx:1.23-alpine
         volumes:
-            - ./tianyi.conf:/etc/nginx/conf.d/tianyi.conf
+            - ./tianyi.conf:/etc/nginx/conf.d/tianyi.conf:ro
         networks:
             - tianyi
         ports:
