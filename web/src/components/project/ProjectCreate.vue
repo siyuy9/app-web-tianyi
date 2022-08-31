@@ -95,7 +95,6 @@
 <script>
 import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import axios from "axios";
 import Error from "../../lib/main/Error";
 
 export default {
@@ -124,21 +123,21 @@ export default {
         return;
       }
       this.submitted = true;
-      axios
-        .post("/api/v1/projects", {
+      this.$store
+        .dispatch("project/createProject", {
           name: this.project_name,
           source: this.project_source,
-          default_branch: this.project_default_branch,
+          defaultBranch: this.project_default_branch,
         })
-        .then((response) => {
+        .then((response) =>
           this.$router.push({
             name: "project",
             params: {
-              project_path: response.data.path,
+              project_path: response.data.data.path,
             },
-          });
-        })
-        .catch((error) => Error(error, this.$toast))
+          })
+        )
+        .catch(Error)
         .finally(() => (this.submitted = false));
     },
   },

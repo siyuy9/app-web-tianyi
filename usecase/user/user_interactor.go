@@ -4,23 +4,16 @@ import (
 	"github.com/google/uuid"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
 	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
-	usecaseJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
 )
 
 type userInteractor struct {
 	repository Repository
-	jwt        usecaseJWT.Interactor
 }
 
-func New(repository Repository, jwt usecaseJWT.Interactor) Interactor {
+func New(repository Repository) Interactor {
 	return &userInteractor{
 		repository: repository,
-		jwt:        jwt,
 	}
-}
-
-func (interactor *userInteractor) JWT() usecaseJWT.Interactor {
-	return interactor.jwt
 }
 
 func (interactor *userInteractor) Validate(user *entity.User) error {

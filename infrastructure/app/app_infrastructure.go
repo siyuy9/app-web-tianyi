@@ -173,12 +173,11 @@ func (server *server) SetupInteractor() {
 	if server.repositories == nil {
 		log.Panicln("repository is nil")
 	}
-	jwt := infraJWT.NewInteractor(server.config.Server.JWT)
 	branch := usecaseBranch.New(server.repositories.branch)
 	server.interactors = &usecaseApp.Interactor{
 		Lifecycle: usecaseLifecycle.New(server),
-		User:      usecaseUser.New(server.repositories.user, jwt),
-		JWT:       jwt,
+		User:      usecaseUser.New(server.repositories.user),
+		JWT:       infraJWT.NewInteractor(server.config.Server.JWT),
 		Project:   usecaseProject.New(server.repositories.project, branch),
 		Branch:    branch,
 		Session:   usecaseSession.New(server.repositories.session),

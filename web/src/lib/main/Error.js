@@ -1,7 +1,7 @@
 import EventBus from "./EventBus";
 
-export default async function AddErrorMessages(error, toast) {
-  await error;
+export default function AddErrorMessages(error, toast) {
+  console.log(error);
   var send = toast
     ? toast.add
     : (error) => EventBus.emit("app-toast-add", error);

@@ -3,7 +3,6 @@ package usecaseUser
 import (
 	"github.com/google/uuid"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
 )
 
 // interactor for entity.User
@@ -28,9 +27,6 @@ type Interactor interface {
 	)
 	// creates a hashed password from the given string
 	PasswordHashCreate(password string) (hashedPassword string)
-
-	// jwt stuff
-	JWT() usecaseJWT.Interactor
 }
 
 // repository for entity.User

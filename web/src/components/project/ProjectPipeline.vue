@@ -1,5 +1,12 @@
 <template>
-  <div class="card">
+  <div v-if="loadingPipeline" class="card">
+    <Skeleton class="mb-2" borderRadius="16px"></Skeleton>
+    <Skeleton class="mb-2" borderRadius="16px"></Skeleton>
+    <Skeleton class="mb-2" borderRadius="16px"></Skeleton>
+    <Skeleton class="mb-2" borderRadius="16px"></Skeleton>
+    <Skeleton class="mb-2" borderRadius="16px"></Skeleton>
+  </div>
+  <div v-if="!loadingPipeline" class="card">
     <div class="flex justify-content-between">
       <div class="font-medium text-3xl text-900 mb-3">{{ pipeline.name }}</div>
       <Button
@@ -23,16 +30,16 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapGetters } from "vuex";
 import Error from "../../lib/main/Error";
-import EventBus from "../../lib/main/EventBus";
 
 export default {
   data() {
     return {
       pipelineData: {},
       pipelineLaunched: false,
+      loadingPipeline: false,
+      branchData: {},
     };
   },
   computed: {
@@ -44,7 +51,7 @@ export default {
       project_id: "id",
     }),
     jobs() {
-      return this.branch.config.jobs;
+      return this.branchData.config.jobs;
     },
   },
   methods: {
@@ -53,12 +60,13 @@ export default {
         return;
       }
       this.pipelineLaunched = true;
-      axios
-        .post(
-          `/api/v1/projects/${this.project_id}/branches/${this.$route.params.pipeline_branch}/pipelines/${this.$route.params.pipeline_name}`
-        )
+      this.$store
+        .dispatch("project/createPipeline", {
+          branchName: this.$route.params.pipeline_branch,
+          pipelineName: this.$route.params.pipeline_name,
+        })
         .then((response) =>
-          EventBus.emit("app-toast-add", {
+          this.$toast.add({
             severity: "success",
             summary: "pipeline launched",
             detail: response.data.web_url,
@@ -68,28 +76,29 @@ export default {
         .catch(Error)
         .finally(() => (this.pipelineLaunched = false));
     },
+    loadPipeline() {
+      this.loadingPipeline = true;
+      this.$store
+        .dispatch("project/loadBranch", this.$route.params.pipeline_branch)
+        .then((response) => {
+          this.branchData = response.data.data;
+          response.data.data.config.pipelines.some((element) => {
+            if (element.name !== this.$route.params.pipeline_name) {
+              return false;
+            }
+            this.pipelineData = element;
+            return true;
+          });
+          this.loadingPipeline = false;
+        })
+        .catch(Error);
+    },
   },
-  async beforeMount() {
-    try {
-      // load the current project
-      await this.$store.dispatch(
-        "project/loadProject",
-        this.$route.params.project_path
-      );
-      await this.$store.dispatch(
-        "project/loadBranch",
-        this.$route.params.pipeline_branch
-      );
-      this.branch.config.pipelines.some((element) => {
-        if (element.name !== this.$route.params.pipeline_name) {
-          return false;
-        }
-        this.pipelineData = element;
-        return true;
-      });
-    } catch (error) {
-      Error(error);
-    }
+  beforeMount() {
+    this.loadPipeline();
+  },
+  beforeRouteUpdate() {
+    this.loadPipeline();
   },
 };
 </script>

@@ -35,12 +35,12 @@ const state = () => {
 };
 
 const mutations = {
-  updateProject: (state, { projectID, project_data }) => {
+  updateProject: (state, { projectID, projectData }) => {
     // Object.assign doesn't work on undefined
     if (!state.projects[projectID]) {
       state.projects[projectID] = { ...emptyProject };
     }
-    Object.assign(state.projects[projectID], project_data);
+    Object.assign(state.projects[projectID], projectData);
   },
   updateBranch(state, { projectID, branchName, branchData }) {
     // Object.assign doesn't work on undefined;
@@ -76,9 +76,40 @@ const actions = {
           var project = response.data.data[0];
           commit("updateProject", {
             projectID: project.id,
-            project_data: project,
+            projectData: project,
           });
           commit("currentID", project.id);
+          resolve(response);
+        })
+        .catch(reject)
+    );
+  },
+  createProject({ commit }, { name, source, defaultBranch }) {
+    return new Promise((resolve, reject) =>
+      axios
+        .post("/api/v1/projects", {
+          name: name,
+          source: source,
+          default_branch: defaultBranch,
+        })
+        .then((response) => {
+          commit("updateProject", {
+            projectID: response.data.data.id,
+            projectData: response.data.data,
+          });
+          resolve(response);
+        })
+        .catch(reject)
+    );
+  },
+  createPipeline({ getters }, { branchName, pipelineName }) {
+    return new Promise((resolve, reject) =>
+      axios
+        .post(
+          `/api/v1/projects/${getters.currentID}/branches/${branchName}/pipelines/${pipelineName}`
+        )
+        .then((response) => {
+          //commit("loadPipeline")
           resolve(response);
         })
         .catch(reject)

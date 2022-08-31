@@ -79,7 +79,6 @@ export default {
       defaultBranch: "currentDefaultBranchName",
       projectID: "currentProjectID",
       branchesMap: "currentBranches",
-      getCurrentBranch: "currentBranch",
     }),
     currentBranch() {
       return this.currentBranchData;
@@ -105,7 +104,14 @@ export default {
       }
       this.updatingRemoteBranch = true;
       this.$store
-        .dispatch("project/updateRemoteBranch")
+        .dispatch("project/updateRemoteBranch", this.currentBranchData.name)
+        .then(() =>
+          this.$toast.add({
+            severity: "success",
+            summary: "branch updated",
+            life: 3000,
+          })
+        )
         .catch(Error)
         .finally(() => (this.updatingRemoteBranch = false));
     },
@@ -116,9 +122,12 @@ export default {
       this.loadingBranch = true;
       this.$store
         .dispatch("project/loadBranch", branchName)
-        .then(() => {
+        .then((response) => {
           if (setCurrent) {
-            this.currentBranchData = this.getCurrentBranch(branchName);
+            this.currentBranchData = response.data.data;
+          }
+          if (!this.branchesData.length) {
+            this.branchesData = [this.currentBranchData];
           }
           this.loadingBranch = false;
         })
@@ -131,9 +140,9 @@ export default {
       this.loadingBranches = true;
       this.$store
         .dispatch("project/loadBranches")
-        .then((branches) => {
+        .then((response) => {
           this.loadingBranches = false;
-          this.branchesData = branches;
+          this.branchesData = response.data.data;
         })
         .catch(Error);
     },

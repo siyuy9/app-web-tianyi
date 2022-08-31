@@ -1,5 +1,10 @@
 package entity
 
+type Pipeline struct {
+	CommonFields
+	Result string `json:"result"`
+}
+
 type PipelineConfig struct {
 	Jobs      []PipelineConfigJob      `hcl:"job,block" json:"jobs"`
 	Pipelines []PipelineConfigPipeline `hcl:"pipeline,block" json:"pipelines"`

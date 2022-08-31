@@ -23,6 +23,7 @@ deploy:
     variables:
         APP_DIR: /var/tianyi
     only: [tags]
+    except: [branches]
     script:
         - export PATH="${PATH}:/usr/libexec/docker/cli-plugins"
         - test -d "${APP_DIR}" || exit 1

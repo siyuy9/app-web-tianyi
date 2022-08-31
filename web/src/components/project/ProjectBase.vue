@@ -24,7 +24,7 @@
             Project ID: {{ currentProjectID }}
             <Button
               icon="pi pi-copy"
-              class="ml-1 p-button-text p-button-plain h-1rem w-2rem"
+              class="p-button-text p-button-plain h-1rem w-2rem"
               v-tooltip.bottom="'Copy project id'"
               @click="writeToClipboard(currentProjectID)"
             />
