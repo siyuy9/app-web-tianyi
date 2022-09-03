@@ -1,8 +1,18 @@
 package entity
 
+import "github.com/google/uuid"
+
 type Pipeline struct {
 	CommonFields
-	Result string `json:"result"`
+	ProjectID uuid.UUID `gorm:"type:uuid;not null;" json:"project_id"`
+	BranchID  uuid.UUID `gorm:"type:uuid;not null;" json:"branch_id"`
+}
+
+type Job struct {
+	CommonFields
+	PipelineID uuid.UUID `gorm:"type:uuid;not null;" json:"pipeline_id"`
+	Result     bool      `json:"result"`
+	Log        string    `json:"log"`
 }
 
 type PipelineConfig struct {
@@ -18,7 +28,9 @@ type PipelineConfigJob struct {
 }
 
 type PipelineConfigPipelineJob struct {
-	Name string `hcl:"name,label" json:"name"`
+	Name     string   `hcl:"name,label" json:"name"`
+	Job      string   `hcl:"job,label" json:"job"`
+	Requires []string `hcl:"requires" json:"requires"`
 }
 
 type PipelineConfigPipeline struct {

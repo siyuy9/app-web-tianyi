@@ -10,7 +10,7 @@ server:
 database:
     type: postgresql
     connection:
-        host: kongrentian.com
+        host: dev.kongrentian.com
         port: 5432
         user: admin
         password: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
@@ -18,7 +18,7 @@ database:
         sslmode: disable
 
 redis:
-    host: kongrentian.com
+    host: dev.kongrentian.com
     port: 6379
     password: "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
     database: 0

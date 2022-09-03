@@ -13,6 +13,8 @@ services:
             - ./database_extensions.sql:/docker-entrypoint-initdb.d/database_extensions.sql:ro
         networks:
             - tianyi
+        ports:
+            - "5432:5432"
 
     redis:
         container_name: tianyi_redis
@@ -21,27 +23,8 @@ services:
         networks:
             - tianyi
         command: redis-server --requirepass "spo,h-6'383<YN%P<abr[l5Xv!o*O=+}"
-
-    tianyi:
-        container_name: tianyi_server
-        image: kongrentian/tianyi:${CI_COMMIT_REF_NAME}
-        volumes:
-            - ./tianyi.yml:/app/tianyi.yml:ro
-        networks:
-            - tianyi
-        depends_on:
-            - postgres
-            - redis
-
-    nginx:
-        container_name: tianyi_nginx
-        image: nginx:1.23-alpine
-        volumes:
-            - ./tianyi.conf:/etc/nginx/conf.d/tianyi.conf:ro
-        networks:
-            - tianyi
         ports:
-            - "443:443"
+            - "6379:6379"
 
 networks:
     tianyi:

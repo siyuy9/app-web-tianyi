@@ -22,7 +22,7 @@ type Project struct {
 	Description   string   `json:"description"`
 	Source        string   `json:"source" validate:"required"`
 	DefaultBranch string   `gorm:"not null;size:256;default:master" json:"default_branch" validate:"required,min=1,max=256"`
-	Branches      []Branch `gorm:"foreignKey:ProjectID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"branches"`
+	Branches      []Branch `gorm:"foreignKey:ProjectID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
 }
 
 // contains groups and projects
@@ -33,6 +33,6 @@ type Namespace struct {
 	// display name
 	Name       string      `gorm:"index:namespace_name,unique;size:256" json:"name" validate:"required,min=1,max=256"`
 	Path       string      `json:"path"`
-	Namespaces []Namespace `gorm:"foreignKey:ParentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"namespaces"`
-	Projects   []Project   `gorm:"foreignKey:NamespaceID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"projects"`
+	Namespaces []Namespace `gorm:"foreignKey:ParentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
+	Projects   []Project   `gorm:"foreignKey:NamespaceID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
 }

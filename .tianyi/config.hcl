@@ -6,7 +6,10 @@ job "job1" "POST" {
 }
 
 pipeline "pipeline1" {
-    job "job1" {}
+    job "first job" "job1" {}
+    job "second job" "job1" {
+        requires = ["first job"]
+    }
 }
 
 pipeline "pipeline2" {
