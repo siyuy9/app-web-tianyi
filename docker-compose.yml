@@ -38,6 +38,7 @@ services:
         image: nginx:1.23-alpine
         volumes:
             - ./tianyi.conf:/etc/nginx/conf.d/tianyi.conf:ro
+            - ./ssl:/etc/nginx/ssl:ro
         networks:
             - tianyi
         ports:

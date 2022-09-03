@@ -655,96 +655,6 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.Branch": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "config": {
-                    "$ref": "#/definitions/entity.PipelineConfig"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/sql.NullTime"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 256,
-                    "minLength": 1
-                },
-                "project_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.PipelineConfig": {
-            "type": "object",
-            "properties": {
-                "jobs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.PipelineConfigJob"
-                    }
-                },
-                "pipelines": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.PipelineConfigPipeline"
-                    }
-                }
-            }
-        },
-        "entity.PipelineConfigJob": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "query": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "request_type": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.PipelineConfigPipeline": {
-            "type": "object",
-            "properties": {
-                "jobs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.PipelineConfigPipelineJob"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.PipelineConfigPipelineJob": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "entity.Project": {
             "type": "object",
             "required": [
@@ -753,12 +663,6 @@ const docTemplate = `{
                 "source"
             ],
             "properties": {
-                "branches": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Branch"
-                    }
-                },
                 "created_at": {
                     "type": "string"
                 },

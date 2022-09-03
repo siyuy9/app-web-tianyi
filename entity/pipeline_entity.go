@@ -28,9 +28,9 @@ type PipelineConfigJob struct {
 }
 
 type PipelineConfigPipelineJob struct {
-	Name     string   `hcl:"name,label" json:"name"`
-	Job      string   `hcl:"job,label" json:"job"`
-	Requires []string `hcl:"requires" json:"requires"`
+	Name     string    `hcl:"name,label" json:"name"`
+	Job      string    `hcl:"job,label" json:"job"`
+	Requires *[]string `hcl:"requires" json:"requires"`
 }
 
 type PipelineConfigPipeline struct {

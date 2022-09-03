@@ -13,5 +13,5 @@ pipeline "pipeline1" {
 }
 
 pipeline "pipeline2" {
-    job "job1" {}
+    job "first job" "job1" {}
 }
