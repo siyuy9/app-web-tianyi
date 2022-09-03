@@ -22,8 +22,10 @@ deploy:
     tags: [trigger]
     variables:
         APP_DIR: /var/tianyi
-    only: [tags]
-    except: [branches]
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "push"
+          when: manual
+        - if: $CI_COMMIT_TAG
     script:
         - export PATH="${PATH}:/usr/libexec/docker/cli-plugins"
         - test -d "${APP_DIR}" || exit 1
