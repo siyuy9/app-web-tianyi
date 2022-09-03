@@ -42,7 +42,8 @@ services:
         networks:
             - tianyi
         ports:
-            - "443:443"
-
+            - "443:8080"
+        depends_on:
+            - tianyi
 networks:
     tianyi:
