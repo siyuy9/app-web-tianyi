@@ -1,15 +1,15 @@
 package usecaseSession
 
+const (
+	UserID        = "user_id"
+	SessionCookie = "session_id"
+)
+
 type Interactor interface {
 	Get(context interface{}) (Session, error)
 	Reset() error
 	Close() error
 }
-
-const (
-	UserID        = "user_id"
-	SessionCookie = "session_id"
-)
 
 type Repository interface {
 	Get(context interface{}) (Session, error)

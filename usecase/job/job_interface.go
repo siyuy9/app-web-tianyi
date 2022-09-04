@@ -5,9 +5,9 @@ import (
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
 )
 
-type Pool interface{}
-
-type Interactor interface{}
+type Interactor interface {
+	Repository() Repository
+}
 
 // repository for entity.Job
 type Repository interface {
@@ -18,6 +18,8 @@ type Repository interface {
 	FindOne(condition *entity.Job) (*entity.Job, error)
 	// get by id
 	Get(id uuid.UUID) (*entity.Job, error)
+	// get by redis id
+	GetByRedisID(id string) (*entity.Job, error)
 	// return an array of jobs based on conditions
 	// https://gorm.io/docs/query.html
 	Find(conditions ...interface{}) ([]entity.Job, error)

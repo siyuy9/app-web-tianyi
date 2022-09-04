@@ -9,9 +9,11 @@ const (
 	InteractorKey = "usecasePipeline.Interactor"
 )
 
-type Pool interface{}
-
-type Interactor interface{}
+type Interactor interface {
+	Repository() Repository
+	RunJob(job *entity.Job) error
+	JobErrorHandler(job *entity.Job, err error) error
+}
 
 // repository for entity.Pipeline
 type Repository interface {

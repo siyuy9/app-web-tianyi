@@ -7,3 +7,7 @@ type interactor struct {
 func New(pool Pool) Interactor {
 	return &interactor{pool}
 }
+
+func (interactor *interactor) Pool() Pool {
+	return interactor.pool
+}

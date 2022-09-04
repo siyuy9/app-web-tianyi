@@ -32,6 +32,12 @@ func (repository *repository) Get(id uuid.UUID) (*entity.Job, error) {
 	return job, repository.database.First(&job, id).Error
 }
 
+func (repository *repository) GetByRedisID(id string) (*entity.Job, error) {
+	job := &entity.Job{}
+	err := repository.database.First(&job, &entity.Job{RedisJobID: id}).Error
+	return job, err
+}
+
 func (repository *repository) Find(
 	conditions ...interface{},
 ) ([]entity.Job, error) {

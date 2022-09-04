@@ -14,10 +14,3 @@ func (context *Context) Log(
 	fmt.Println("Starting job: ", job.Name)
 	return next()
 }
-
-func (context *Context) PipelineJob(job *work.Job) error {
-	if err := job.ArgError(); err != nil {
-		return err
-	}
-	return nil
-}

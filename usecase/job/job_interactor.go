@@ -2,10 +2,16 @@ package usecaseJob
 
 import "gitlab.com/kongrentian-group/tianyi/v1/entity"
 
-type interactor struct{}
+type interactor struct {
+	repository Repository
+}
 
-func New() Interactor {
-	return &interactor{}
+func New(repository Repository) Interactor {
+	return &interactor{repository}
+}
+
+func (interactor *interactor) Repository() Repository {
+	return interactor.repository
 }
 
 func (interactor *interactor) Create(

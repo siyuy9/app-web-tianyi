@@ -14,23 +14,26 @@ import (
 	"gitlab.com/kongrentian-group/tianyi/v1/api/controller"
 	"gitlab.com/kongrentian-group/tianyi/v1/docs"
 	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
-
-	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"
-	infraJWT "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/jwt"
-	infraProject "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/project"
-
-	infraPool "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/pool"
 	web2 "gitlab.com/kongrentian-group/tianyi/v1/web"
 
 	infraBranch "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/branch"
+	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"
+	infraJob "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/job"
+	infraJWT "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/jwt"
+	infraPipeline "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/pipeline"
+	infraPool "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/pool"
+	infraProject "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/project"
 	infraSession "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/session"
 	infraUser "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/user"
 
 	usecaseApp "gitlab.com/kongrentian-group/tianyi/v1/usecase/app"
 	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
+	usecaseJob "gitlab.com/kongrentian-group/tianyi/v1/usecase/job"
 	usecaseLifecycle "gitlab.com/kongrentian-group/tianyi/v1/usecase/lifecycle"
+	usecasePipeline "gitlab.com/kongrentian-group/tianyi/v1/usecase/pipeline"
 	usecasePool "gitlab.com/kongrentian-group/tianyi/v1/usecase/pool"
 	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
+
 	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 	usecaseUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
 )
@@ -42,11 +45,13 @@ var (
 )
 
 type infrastructure struct {
-	user    usecaseUser.Repository    `validate:"required"`
-	project usecaseProject.Repository `validate:"required"`
-	branch  usecaseBranch.Repository  `validate:"required"`
-	session usecaseSession.Interactor `validate:"required"`
-	pool    usecasePool.Pool          `validate:"required"`
+	user     usecaseUser.Repository     `validate:"required"`
+	project  usecaseProject.Repository  `validate:"required"`
+	branch   usecaseBranch.Repository   `validate:"required"`
+	session  usecaseSession.Interactor  `validate:"required"`
+	pool     usecasePool.Pool           `validate:"required"`
+	job      usecaseJob.Repository      `validate:"required"`
+	pipeline usecasePipeline.Repository `validate:"required"`
 }
 
 type server struct {
@@ -171,12 +176,15 @@ func (server *server) SetupInfrastructure() {
 	if server.database == nil {
 		log.Panicln("database is nil")
 	}
+	job := infraJob.New(server.database)
 	server.infrastructure = &infrastructure{
-		user:    infraUser.New(server.database),
-		project: infraProject.New(server.database),
-		branch:  infraBranch.New(server.database),
-		session: infraSession.New(server.config.Redis),
-		pool:    infraPool.New(server.config),
+		user:     infraUser.New(server.database),
+		project:  infraProject.New(server.database),
+		branch:   infraBranch.New(server.database),
+		session:  infraSession.New(server.config.Redis),
+		pool:     infraPool.New(server.config, job),
+		job:      job,
+		pipeline: infraPipeline.New(server.database),
 	}
 	if err := pkg.ValidateStruct(server.infrastructure); err != nil {
 		panic(err)
@@ -188,6 +196,7 @@ func (server *server) SetupInteractor() {
 		log.Panicln("repository is nil")
 	}
 	branch := usecaseBranch.New(server.infrastructure.branch)
+	job := usecaseJob.New(server.infrastructure.job)
 	server.interactors = &usecaseApp.Interactor{
 		Lifecycle: usecaseLifecycle.New(server),
 		User:      usecaseUser.New(server.infrastructure.user),
@@ -196,6 +205,8 @@ func (server *server) SetupInteractor() {
 		Branch:    branch,
 		Session:   usecaseSession.New(server.infrastructure.session),
 		Pool:      usecasePool.New(server.infrastructure.pool),
+		Job:       job,
+		Pipeline:  usecasePipeline.New(server.infrastructure.pipeline, job),
 	}
 	if err := pkg.ValidateStruct(server.interactors); err != nil {
 		log.Panicln(err)
@@ -234,6 +245,10 @@ func (server *server) SetupController() {
 	if err := pkg.ValidateStruct(server.controllers); err != nil {
 		log.Panicln(err)
 	}
+	server.infrastructure.pool.Job(
+		usecasePipeline.InteractorKey, server.interactors.Pipeline.RunJob,
+		server.interactors.Pipeline.JobErrorHandler,
+	)
 }
 
 func (server *server) SetupSwagger() {

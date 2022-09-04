@@ -5,8 +5,9 @@ import "github.com/google/uuid"
 type JobStatus string
 
 var (
-	Created JobStatus = "CREATED"
-	Running JobStatus = "RUNNING"
+	JobCreated JobStatus = "CREATED"
+	JobRunning JobStatus = "RUNNING"
+	JobError   JobStatus = "ERROR"
 )
 
 type Pipeline struct {
@@ -17,12 +18,13 @@ type Pipeline struct {
 
 type Job struct {
 	CommonFields
-	PipelineID   uuid.UUID `gorm:"type:uuid;not null;" json:"pipeline_id"`
-	RedisJobID   string    `gorm:"not null;" json:"redis_job_id"`
-	RedisJobName string    `gorm:"not null;" json:"redis_job_name"`
-	Result       bool      `json:"result"`
-	Status       JobStatus `gorm:"not null;" json:"status"`
-	Log          string    `json:"log"`
+	PipelineID   uuid.UUID         `gorm:"type:uuid;not null;" json:"pipeline_id"`
+	RedisJobID   string            `gorm:"not null;" json:"redis_job_id"`
+	RedisJobName string            `gorm:"not null;" json:"redis_job_name"`
+	Result       bool              `json:"result"`
+	Status       JobStatus         `gorm:"not null;" json:"status"`
+	Log          string            `json:"log"`
+	Config       PipelineConfigJob `json:"-"`
 }
 
 type PipelineConfig struct {
