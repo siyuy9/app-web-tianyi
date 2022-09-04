@@ -1,4 +1,4 @@
-package usecasePipeline
+package usecaseJob
 
 import "gitlab.com/kongrentian-group/tianyi/v1/entity"
 

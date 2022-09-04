@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
+	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
 )
 
 type repository struct {

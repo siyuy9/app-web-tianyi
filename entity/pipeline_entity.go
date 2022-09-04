@@ -2,6 +2,13 @@ package entity
 
 import "github.com/google/uuid"
 
+type JobStatus string
+
+var (
+	Created JobStatus = "CREATED"
+	Running JobStatus = "RUNNING"
+)
+
 type Pipeline struct {
 	CommonFields
 	ProjectID uuid.UUID `gorm:"type:uuid;not null;" json:"project_id"`
@@ -10,9 +17,12 @@ type Pipeline struct {
 
 type Job struct {
 	CommonFields
-	PipelineID uuid.UUID `gorm:"type:uuid;not null;" json:"pipeline_id"`
-	Result     bool      `json:"result"`
-	Log        string    `json:"log"`
+	PipelineID   uuid.UUID `gorm:"type:uuid;not null;" json:"pipeline_id"`
+	RedisJobID   string    `gorm:"not null;" json:"redis_job_id"`
+	RedisJobName string    `gorm:"not null;" json:"redis_job_name"`
+	Result       bool      `json:"result"`
+	Status       JobStatus `gorm:"not null;" json:"status"`
+	Log          string    `json:"log"`
 }
 
 type PipelineConfig struct {

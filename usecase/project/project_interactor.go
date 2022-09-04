@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
 	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
-	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
+	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
 )
 
 type interactor struct {

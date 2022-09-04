@@ -1,12 +1,17 @@
 import EventBus from "./EventBus";
 
-export default function AddErrorMessages(error, toast) {
+function send(error) {
+  EventBus.emit("app-toast-add", error);
+}
+
+export default function AddErrorMessages(error, handle) {
   console.log(error);
-  var send = toast
-    ? toast.add
-    : (error) => EventBus.emit("app-toast-add", error);
+  if (!handle) {
+    handle = send;
+  }
+
   if (!error.response) {
-    send({
+    handle({
       severity: "error",
       summary: error.message,
       detail: error,
@@ -14,7 +19,7 @@ export default function AddErrorMessages(error, toast) {
     });
     return;
   }
-  send({
+  handle({
     severity: "error",
     summary: error.message,
     detail: error.response.data.error,

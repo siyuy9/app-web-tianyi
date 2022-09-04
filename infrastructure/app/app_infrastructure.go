@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,16 +18,19 @@ import (
 	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"
 	infraJWT "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/jwt"
 	infraProject "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/project"
+
+	infraPool "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/pool"
 	web2 "gitlab.com/kongrentian-group/tianyi/v1/web"
 
-	infraBranch "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/project/branch"
+	infraBranch "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/branch"
 	infraSession "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/session"
 	infraUser "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/user"
 
 	usecaseApp "gitlab.com/kongrentian-group/tianyi/v1/usecase/app"
+	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
 	usecaseLifecycle "gitlab.com/kongrentian-group/tianyi/v1/usecase/lifecycle"
+	usecasePool "gitlab.com/kongrentian-group/tianyi/v1/usecase/pool"
 	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
-	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
 	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 	usecaseUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
 )
@@ -37,20 +41,21 @@ var (
 	Description = "description"
 )
 
-type repositories struct {
+type infrastructure struct {
 	user    usecaseUser.Repository    `validate:"required"`
 	project usecaseProject.Repository `validate:"required"`
 	branch  usecaseBranch.Repository  `validate:"required"`
 	session usecaseSession.Interactor `validate:"required"`
+	pool    usecasePool.Pool          `validate:"required"`
 }
 
 type server struct {
-	config       *infraConfig.App
-	database     *gorm.DB
-	router       *fiber.App
-	controllers  *controller.App
-	interactors  *usecaseApp.Interactor
-	repositories *repositories
+	config         *infraConfig.App
+	database       *gorm.DB
+	router         *fiber.App
+	controllers    *controller.App
+	interactors    *usecaseApp.Interactor
+	infrastructure *infrastructure
 }
 
 func new(configs ...*infraConfig.App) *server {
@@ -72,9 +77,9 @@ func New(configs ...*infraConfig.App) *usecaseApp.Interactor {
 
 func (server *server) Migrate() error {
 	repositories := []interface{ Migrate() error }{
-		server.repositories.branch,
-		server.repositories.project,
-		server.repositories.user,
+		server.infrastructure.branch,
+		server.infrastructure.project,
+		server.infrastructure.user,
 	}
 	for _, repository := range repositories {
 		if err := repository.Migrate(); err != nil {
@@ -110,18 +115,26 @@ func (server *server) ShutdownOnPanic() {
 
 func (server *server) Shutdown(code int) {
 	log.Println("Shutting down...")
-	errors := []error{
-		server.router.Shutdown(),
-		server.repositories.session.Close(),
+	shutdowns := []func() error{
+		server.router.Shutdown,
+		server.infrastructure.session.Close,
+		server.infrastructure.pool.Close,
 	}
-	for _, err := range errors {
-		if err == nil {
-			continue
-		}
-		log.Println("Shutdown error:\n", err)
+	waitGroup := sync.WaitGroup{}
+	failToggle := false
+	for _, shutdown := range shutdowns {
+		waitGroup.Add(1)
+		go func(shutdown func() error) {
+			defer waitGroup.Done()
+			if err := shutdown(); err != nil {
+				failToggle = true
+				log.Println(err)
+			}
+		}(shutdown)
 	}
-	if len(errors) != 0 {
-		code = 1
+	waitGroup.Wait()
+	if failToggle {
+		os.Exit(1)
 	}
 	os.Exit(code)
 }
@@ -139,7 +152,7 @@ func (server *server) ShutdownOnInterruptionSignal() {
 func (server *server) Setup() {
 	server.SetupConfig()
 	server.SetupDatabase()
-	server.SetupRepository()
+	server.SetupInfrastructure()
 	server.SetupInteractor()
 	server.SetupController()
 	server.SetupSwagger()
@@ -154,54 +167,55 @@ func (server *server) SetupDatabase() {
 	server.database = connectDatabase(server.config.Database)
 }
 
-func (server *server) SetupRepository() {
+func (server *server) SetupInfrastructure() {
 	if server.database == nil {
 		log.Panicln("database is nil")
 	}
-	server.repositories = &repositories{
+	server.infrastructure = &infrastructure{
 		user:    infraUser.New(server.database),
 		project: infraProject.New(server.database),
 		branch:  infraBranch.New(server.database),
 		session: infraSession.New(server.config.Redis),
+		pool:    infraPool.New(server.config),
 	}
-	if err := pkg.ValidateStruct(server.repositories); err != nil {
+	if err := pkg.ValidateStruct(server.infrastructure); err != nil {
 		panic(err)
 	}
 }
 
 func (server *server) SetupInteractor() {
-	if server.repositories == nil {
+	if server.infrastructure == nil {
 		log.Panicln("repository is nil")
 	}
-	branch := usecaseBranch.New(server.repositories.branch)
+	branch := usecaseBranch.New(server.infrastructure.branch)
 	server.interactors = &usecaseApp.Interactor{
 		Lifecycle: usecaseLifecycle.New(server),
-		User:      usecaseUser.New(server.repositories.user),
+		User:      usecaseUser.New(server.infrastructure.user),
 		JWT:       infraJWT.NewInteractor(server.config.Server.JWT),
-		Project:   usecaseProject.New(server.repositories.project, branch),
+		Project:   usecaseProject.New(server.infrastructure.project, branch),
 		Branch:    branch,
-		Session:   usecaseSession.New(server.repositories.session),
+		Session:   usecaseSession.New(server.infrastructure.session),
+		Pool:      usecasePool.New(server.infrastructure.pool),
 	}
 	if err := pkg.ValidateStruct(server.interactors); err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 }
 
 func (server *server) SetupController() {
-	if server.repositories == nil {
+	if server.infrastructure == nil {
 		log.Panicln("repository is nil")
 	}
 	jwt := controller.NewJWT(server.config.Server.JWT.GetSecret())
 	server.controllers = &controller.App{
 		User: controller.NewUser(
-			server.interactors.User, server.interactors.JWT,
-			server.interactors.Session,
+			server.interactors.User, server.interactors.Session,
 		),
 		Frontend: controller.NewFrontend(
 			web2.FrontendFilesystem, docs.SwaggerFilesystem,
 		),
 		Session: controller.NewSession(
-			server.repositories.session, jwt, server.interactors.JWT,
+			server.infrastructure.session, jwt, server.interactors.JWT,
 		),
 		Lifecycle: controller.NewLifecycle(
 			server.interactors.Lifecycle,
@@ -218,7 +232,7 @@ func (server *server) SetupController() {
 		JWT: jwt,
 	}
 	if err := pkg.ValidateStruct(server.controllers); err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 }
 
@@ -227,9 +241,7 @@ func (server *server) SetupSwagger() {
 	docs.SwaggerInfo.Description = Description
 	docs.SwaggerInfo.Version = fmt.Sprintf("%.2f", Version)
 	docs.SwaggerInfo.Host = fmt.Sprintf(
-		"%s:%s",
-		server.config.Server.Host,
-		server.config.Server.Port,
+		"%s:%s", server.config.Server.Host, server.config.Server.Port,
 	)
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}

@@ -144,13 +144,9 @@ export default {
           password: this.password,
           email: this.email,
         })
-        .then(() => {
-          this.$router.push({ name: "auth_login" });
-        })
-        .catch((error) => {
-          Error(this.$toast, error);
-          this.submitted = false;
-        });
+        .then(() => this.$router.push({ name: "auth_login" }))
+        .catch((error) => Error(error, this.$toast.add))
+        .finally(() => (this.submitted = false));
     },
   },
 };

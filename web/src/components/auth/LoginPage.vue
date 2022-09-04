@@ -147,7 +147,7 @@ export default {
           remember_me: this.remember_me,
         })
         .then(() => this.$router.push({ name: "root" }))
-        .catch((error) => Error(error, this.$toast))
+        .catch((error) => Error(error, this.$toast.add))
         .finally(() => (this.submitted = false));
     },
   },

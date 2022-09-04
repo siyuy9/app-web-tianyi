@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
 	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 	usecaseUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
 )
@@ -18,19 +17,15 @@ type User interface {
 
 type userController struct {
 	interactor        usecaseUser.Interactor
-	jwtInteractor     usecaseJWT.Interactor
 	sessionInteractor usecaseSession.Interactor
 }
 
 // NewUser: constructor, dependency injection from user service and firebase service
 func NewUser(
-	userInteractor usecaseUser.Interactor, jwtInteractor usecaseJWT.Interactor,
+	userInteractor usecaseUser.Interactor,
 	sessionInteractor usecaseSession.Interactor,
 ) User {
-	return &userController{
-		interactor: userInteractor, jwtInteractor: jwtInteractor,
-		sessionInteractor: sessionInteractor,
-	}
+	return &userController{userInteractor, sessionInteractor}
 }
 
 type (

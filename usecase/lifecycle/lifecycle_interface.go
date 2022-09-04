@@ -36,8 +36,8 @@ type Server interface {
 	SetupSwagger()
 	// setup router
 	SetupRouter()
-	// setup repositories
-	SetupRepository()
+	// setup infrastructure
+	SetupInfrastructure()
 	// setup interactors
 	SetupInteractor()
 	// setup controllers

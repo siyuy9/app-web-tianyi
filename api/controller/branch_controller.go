@@ -5,8 +5,8 @@ import (
 
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
+	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
 	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
-	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/project/branch"
 )
 
 type Branch interface {
