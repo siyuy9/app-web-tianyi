@@ -18,4 +18,4 @@ affect the use-cases and therefore the software in this layer.
 If the details of a use-case change, then some code in this layer will
 certainly be affected.
 */
-package service
+package usecase

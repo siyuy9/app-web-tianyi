@@ -1,4 +1,4 @@
-package usecaseSession
+package useSession
 
 type interactor struct {
 	repository Repository

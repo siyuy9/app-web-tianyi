@@ -13,7 +13,7 @@ import (
 // https://github.com/casdoor/casdoor
 // https://casbin.org/docs/en/adapters
 // https://github.com/casbin/gorm-adapter
-type interactor struct {
+type service struct {
 	enforcer   *casbin.Enforcer
 	database   *gorm.DB
 	configPath string
@@ -32,43 +32,42 @@ type casbinRule struct {
 	V5    string `gorm:"size:512;uniqueIndex:unique_index"`
 }
 
-func NewInteractor(
+func NewService(
 	database *gorm.DB,
 	configPath string,
 ) usecaseAccess.Interactor {
-	return &interactor{database: database, configPath: configPath}
+	return &service{database: database, configPath: configPath}
 }
 
-func (interactor *interactor) SetupEnforcer() {
-	gormadapter.TurnOffAutoMigrate(interactor.database)
+func (s *service) SetupEnforcer() {
+	gormadapter.TurnOffAutoMigrate(s.database)
 	adapter, err := gormadapter.NewAdapterByDBWithCustomTable(
-		interactor.database,
-		&casbinRule{},
+		s.database, &casbinRule{},
 	)
-	interactor.adapter = adapter
+	s.adapter = adapter
 	if err != nil {
 		log.Panicln("could not create the adapter: ", err)
 	}
-	enforcer, err := casbin.NewEnforcer(interactor.configPath, adapter)
+	enforcer, err := casbin.NewEnforcer(s.configPath, adapter)
 	if err != nil {
 		log.Panicln("could not create the enforcer: ", err)
 	}
-	interactor.enforcer = enforcer
-	if err = interactor.Load(); err != nil {
+	s.enforcer = enforcer
+	if err = s.Load(); err != nil {
 		log.Panicln("could not load the policy: ", err)
 	}
 }
 
-func (interactor *interactor) Migrate() error {
-	return interactor.database.AutoMigrate(&casbinRule{})
+func (s *service) Migrate() error {
+	return s.database.AutoMigrate(&casbinRule{})
 }
 
-func (interactor *interactor) Load() error {
-	return interactor.enforcer.LoadPolicy()
+func (s *service) Load() error {
+	return s.enforcer.LoadPolicy()
 }
 
-func (interactor *interactor) Enforce(subject, object, action interface{}) (
+func (s *service) Enforce(subject, object, action interface{}) (
 	bool, error,
 ) {
-	return interactor.enforcer.Enforce(subject, object, action)
+	return s.enforcer.Enforce(subject, object, action)
 }

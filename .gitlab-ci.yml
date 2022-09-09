@@ -23,13 +23,13 @@ deploy:
     variables:
         APP_DIR: /var/tianyi
     rules:
-        - if: $CI_PIPELINE_SOURCE == "push"
+        - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_REF_NAME
           when: manual
         - if: $CI_COMMIT_TAG
     script:
         - export PATH="${PATH}:/usr/libexec/docker/cli-plugins"
         - test -d "${APP_DIR}" || exit 1
-        - cp *.yml *.conf infrastructure/app/*.sql "${APP_DIR}/"
+        - cp *.yml *.conf infrastructure/lifecycle/*.sql "${APP_DIR}/"
         - cd "${APP_DIR}"
         - docker-compose up -d
         - docker-compose restart

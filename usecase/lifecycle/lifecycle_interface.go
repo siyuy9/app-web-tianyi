@@ -1,9 +1,9 @@
-package usecaseLifecycle
+package useLifecycle
 
 // general lifecycle actions
 type Interactor interface {
-	// setup everything (but do not run)
-	Setup()
+	// setup everything
+	Setup() Interactor
 	// run the server
 	Run()
 	// migrate everything
@@ -11,7 +11,7 @@ type Interactor interface {
 }
 
 // specific server actions
-type Server interface {
+type App interface {
 	// listen for requests, blocks the goroutine
 	Listen()
 	// gracefully shutdown
@@ -27,19 +27,19 @@ type Server interface {
 	Migrate() error
 
 	// setup everything
-	Setup()
+	Setup() App
 	// populate the config file
-	SetupConfig()
+	SetupConfig() App
 	// connect to the database
-	SetupDatabase()
+	SetupDatabase() App
 	// setup swagger
-	SetupSwagger()
+	SetupSwagger() App
 	// setup router
-	SetupRouter()
+	SetupRouter() App
 	// setup infrastructure
-	SetupInfrastructure()
+	SetupInfrastructure() App
 	// setup interactors
-	SetupInteractor()
+	SetupInteractor() App
 	// setup controllers
-	SetupController()
+	SetupController() App
 }

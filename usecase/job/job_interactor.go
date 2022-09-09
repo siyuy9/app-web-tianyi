@@ -1,4 +1,4 @@
-package usecaseJob
+package useJob
 
 import "gitlab.com/kongrentian-group/tianyi/v1/entity"
 

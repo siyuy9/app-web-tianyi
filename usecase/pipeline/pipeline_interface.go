@@ -1,4 +1,4 @@
-package usecasePipeline
+package usePipeline
 
 import (
 	"github.com/google/uuid"

@@ -1,4 +1,4 @@
-package usecaseBranch
+package useBranch
 
 import (
 	"errors"

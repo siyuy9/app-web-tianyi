@@ -18,7 +18,7 @@ type jwtInteractor struct {
 	secret []byte
 }
 
-func NewInteractor(config *infraConfig.JWT) usecaseJWT.Interactor {
+func New(config *infraConfig.JWT) usecaseJWT.Interactor {
 	return &jwtInteractor{config: config, secret: config.GetSecret()}
 }
 

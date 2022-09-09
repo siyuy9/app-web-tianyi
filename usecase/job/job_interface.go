@@ -1,4 +1,4 @@
-package usecaseJob
+package useJob
 
 import (
 	"github.com/google/uuid"

@@ -99,7 +99,9 @@ as suggested in
   - https://gorm.io/
   - https://docs.gofiber.io/
   - https://github.com/thomasvvugt/fiber-boilerplate
+  - https://proandroiddev.com/why-you-need-use-cases-interactors-142e8a6fe576
   - https://github.com/ansible-semaphore/semaphore
+  - https://itnext.io/golang-and-clean-architecture-19ae9aae5683
   - https://github.com/spf13/cobra
   - https://github.com/spf13/viper
 

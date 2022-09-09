@@ -1,22 +1,23 @@
-package usecaseLifecycle
+package useLifecycle
 
-type interactor struct {
-	server Server
+type lifecycle struct {
+	app App
 }
 
-func New(server Server) Interactor {
-	return &interactor{server: server}
+func New(app App) Interactor {
+	return &lifecycle{app: app}
 }
 
-func (interactor *interactor) Setup() {
-	interactor.server.Setup()
+func (l *lifecycle) Run() {
+	go l.app.Listen()
+	l.app.ShutdownOnInterruptionSignal()
 }
 
-func (interactor *interactor) Run() {
-	go interactor.server.Listen()
-	interactor.server.ShutdownOnInterruptionSignal()
+func (l *lifecycle) Setup() Interactor {
+	l.app.Setup()
+	return l
 }
 
-func (interactor *interactor) Migrate() error {
-	return interactor.server.Migrate()
+func (l *lifecycle) Migrate() error {
+	return l.app.Migrate()
 }

@@ -1,4 +1,4 @@
-package infraApp
+package infraLifecycle
 
 import (
 	"bytes"

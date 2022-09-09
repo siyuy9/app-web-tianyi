@@ -1,4 +1,4 @@
-package usecaseJWT
+package useJWT
 
 import "gitlab.com/kongrentian-group/tianyi/v1/entity"
 

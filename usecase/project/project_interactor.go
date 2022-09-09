@@ -1,4 +1,4 @@
-package usecaseProject
+package useProject
 
 import (
 	"errors"

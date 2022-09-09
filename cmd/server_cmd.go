@@ -1,8 +1,8 @@
-package cli
+package cmd
 
 import (
 	"github.com/spf13/cobra"
-	infraApp "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/app"
+	"gitlab.com/kongrentian-group/tianyi/v1/infrastructure"
 )
 
 var serverCmd = &cobra.Command{
@@ -16,7 +16,7 @@ var serverRun = &cobra.Command{
 	Short: "start the server",
 	Long:  "description",
 	Run: func(command *cobra.Command, args []string) {
-		infraApp.New().Lifecycle.Run()
+		infrastructure.NewApp().Run()
 	},
 }
 

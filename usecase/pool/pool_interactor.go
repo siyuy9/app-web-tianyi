@@ -1,4 +1,4 @@
-package usecasePool
+package usePool
 
 type interactor struct {
 	pool Pool

@@ -1,4 +1,4 @@
-package infraApp
+package infraLifecycle
 
 import (
 	"github.com/gofiber/fiber/v2"

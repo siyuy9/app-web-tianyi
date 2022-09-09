@@ -1,4 +1,4 @@
-package usecaseSession
+package useSession
 
 const (
 	UserID        = "user_id"
