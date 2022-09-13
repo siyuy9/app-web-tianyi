@@ -1,11 +1,11 @@
-package infraAccess
+package infra
 
 import (
 	"log"
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	usecaseAccess "gitlab.com/kongrentian-group/tianyi/v1/usecase/access"
+	useAccess "gitlab.com/kongrentian-group/tianyi/v1/usecase/access"
 	"gorm.io/gorm"
 )
 
@@ -13,11 +13,11 @@ import (
 // https://github.com/casdoor/casdoor
 // https://casbin.org/docs/en/adapters
 // https://github.com/casbin/gorm-adapter
-type service struct {
-	enforcer   *casbin.Enforcer
-	database   *gorm.DB
-	configPath string
-	adapter    *gormadapter.Adapter
+type access struct {
+	enforcer *casbin.Enforcer
+	db       *gorm.DB
+	confPath string
+	adapter  *gormadapter.Adapter
 }
 
 // https://github.com/casbin/gorm-adapter#customize-table-columns-example
@@ -32,42 +32,31 @@ type casbinRule struct {
 	V5    string `gorm:"size:512;uniqueIndex:unique_index"`
 }
 
-func NewService(
-	database *gorm.DB,
-	configPath string,
-) usecaseAccess.Interactor {
-	return &service{database: database, configPath: configPath}
+func NewService(db *gorm.DB, confPath string) useAccess.Interactor {
+	return &access{db: db, confPath: confPath}
 }
 
-func (s *service) SetupEnforcer() {
-	gormadapter.TurnOffAutoMigrate(s.database)
+func (a *access) SetupEnforcer() {
+	gormadapter.TurnOffAutoMigrate(a.db)
 	adapter, err := gormadapter.NewAdapterByDBWithCustomTable(
-		s.database, &casbinRule{},
+		a.db, &casbinRule{},
 	)
-	s.adapter = adapter
+	a.adapter = adapter
 	if err != nil {
 		log.Panicln("could not create the adapter: ", err)
 	}
-	enforcer, err := casbin.NewEnforcer(s.configPath, adapter)
+	enforcer, err := casbin.NewEnforcer(a.confPath, adapter)
 	if err != nil {
 		log.Panicln("could not create the enforcer: ", err)
 	}
-	s.enforcer = enforcer
-	if err = s.Load(); err != nil {
+	a.enforcer = enforcer
+	if err = a.Load(); err != nil {
 		log.Panicln("could not load the policy: ", err)
 	}
 }
 
-func (s *service) Migrate() error {
-	return s.database.AutoMigrate(&casbinRule{})
-}
-
-func (s *service) Load() error {
-	return s.enforcer.LoadPolicy()
-}
-
-func (s *service) Enforce(subject, object, action interface{}) (
-	bool, error,
-) {
-	return s.enforcer.Enforce(subject, object, action)
+func (a *access) Migrate() error { return a.db.AutoMigrate(&casbinRule{}) }
+func (a *access) Load() error    { return a.enforcer.LoadPolicy() }
+func (a *access) Enforce(subject, object, action interface{}) (bool, error) {
+	return a.enforcer.Enforce(subject, object, action)
 }

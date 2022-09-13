@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"os"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -19,19 +19,13 @@ to quickly create a Cobra application.`,
 }
 
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringP(
-		"config",
-		"c",
-		"",
-		"config path",
-	)
+	rootCmd.PersistentFlags().StringP("config", "c", "", "config path")
 	err := viper.BindPFlag(
 		"config", rootCmd.PersistentFlags().Lookup("config"),
 	)

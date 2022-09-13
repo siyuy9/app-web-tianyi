@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"gitlab.com/kongrentian-group/tianyi/v1/infrastructure"
+	infra "gitlab.com/kongrentian-group/tianyi/v1/infrastructure"
 )
 
 var databaseCmd = &cobra.Command{
@@ -16,7 +16,7 @@ var databaseMigrate = &cobra.Command{
 	Short: "migrate the database",
 	Long:  "description",
 	Run: func(command *cobra.Command, args []string) {
-		infrastructure.NewApp().Migrate()
+		infra.NewApp().Migrate()
 	},
 }
 

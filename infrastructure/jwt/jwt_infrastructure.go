@@ -10,51 +10,51 @@ import (
 	"gitlab.com/kongrentian-group/tianyi/v1/pkg"
 
 	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"
-	usecaseJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
+	useJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
 )
 
-type jwtInteractor struct {
-	config *infraConfig.JWT
+type interactor struct {
+	conf   *infraConfig.JWT
 	secret []byte
 }
 
-func New(config *infraConfig.JWT) usecaseJWT.Interactor {
-	return &jwtInteractor{config: config, secret: config.GetSecret()}
+func New(conf *infraConfig.JWT) useJWT.Interactor {
+	return &interactor{conf: conf, secret: conf.GetSecret()}
 }
 
-func (interactor *jwtInteractor) New(user *entity.User) (string, error) {
+func (ji *interactor) New(user *entity.User) (string, error) {
 	claims := jwt.MapClaims{
 		"id":    user.ID,
 		"admin": user.Admin,
 		"exp": time.Now().Add(
-			time.Hour * time.Duration(interactor.config.Expiration),
+			time.Hour * time.Duration(ji.conf.Expiration),
 		).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(interactor.secret)
+	return token.SignedString(ji.secret)
 }
 
-func (interactor *jwtInteractor) GetClaims(token interface{}) (
-	*entity.JWTClaims, error,
-) {
+func (ji *interactor) Claims(token interface{}) (*entity.JWTClaims, error) {
+	claimErr := func(format string, a ...any) error {
+		return fmt.Errorf("cannot get claims: "+format, a...)
+	}
 	if token == nil {
-		return nil, fmt.Errorf("JWT is nil")
+		return nil, claimErr("jwt is nil")
 	}
 	tokenAsserted, ok := token.(*jwt.Token)
 	if !ok {
-		return nil, fmt.Errorf(
-			"cannot get claims, invalid token: %v", token,
-		)
+		return nil, claimErr("invalid token: %+v", token)
 	}
 	claimsMap, ok := tokenAsserted.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, fmt.Errorf(
-			"cannot get claims, invalid claim map: %v", tokenAsserted.Claims,
-		)
+		return nil, claimErr("invalid claim map: %+v", tokenAsserted.Claims)
 	}
 	claims := &entity.JWTClaims{}
 	if err := mapstructure.Decode(token, claimsMap); err != nil {
-		return nil, err
+		return nil, claimErr("%w", err)
 	}
-	return claims, pkg.ValidateStruct(claims)
+	if err := pkg.ValidateStruct(claims); err != nil {
+		return nil, claimErr("%w", err)
+	}
+	return claims, nil
 }

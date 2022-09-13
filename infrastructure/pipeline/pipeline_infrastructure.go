@@ -9,49 +9,47 @@ import (
 )
 
 type repository struct {
-	database *gorm.DB
+	db *gorm.DB
 }
 
-func New(database *gorm.DB) usecasePipeline.Repository {
-	return &repository{database: database}
+func New(db *gorm.DB) usecasePipeline.Repository {
+	return &repository{db: db}
 }
 
-func (repository *repository) GetAll() ([]entity.Pipeline, error) {
-	return repository.Find()
+func (r *repository) GetAll() ([]entity.Pipeline, error) {
+	return r.Find()
 }
 
-func (repository *repository) FindOne(
-	condition *entity.Pipeline,
+func (r *repository) FindOne(condition *entity.Pipeline,
 ) (*entity.Pipeline, error) {
-	Pipeline := &entity.Pipeline{}
-	return Pipeline, repository.database.First(&Pipeline, condition).Error
+	pipeline := &entity.Pipeline{}
+	return pipeline, r.db.First(&pipeline, condition).Error
 }
 
-func (repository *repository) Get(id uuid.UUID) (*entity.Pipeline, error) {
-	Pipeline := &entity.Pipeline{}
-	return Pipeline, repository.database.First(&Pipeline, id).Error
+func (r *repository) Get(id uuid.UUID) (*entity.Pipeline, error) {
+	pipeline := &entity.Pipeline{}
+	return pipeline, r.db.First(&pipeline, id).Error
 }
 
-func (repository *repository) Find(
+func (r *repository) Find(
 	conditions ...interface{},
 ) ([]entity.Pipeline, error) {
-	Pipelines := make([]entity.Pipeline, 0)
-	err := repository.database.Find(&Pipelines, conditions...).Error
-	return Pipelines, err
+	pipelines := make([]entity.Pipeline, 0)
+	return pipelines, r.db.Find(&pipelines, conditions...).Error
 }
 
-func (repository *repository) Save(Pipeline *entity.Pipeline) error {
-	return repository.database.Save(Pipeline).Error
+func (r *repository) Save(Pipeline *entity.Pipeline) error {
+	return r.db.Save(Pipeline).Error
 }
 
-func (repository *repository) Create(Pipeline *entity.Pipeline) error {
-	return repository.database.Create(Pipeline).Error
+func (r *repository) Create(Pipeline *entity.Pipeline) error {
+	return r.db.Create(Pipeline).Error
 }
 
-func (repository *repository) Delete(Pipeline *entity.Pipeline) error {
-	return repository.database.Delete(Pipeline).Error
+func (r *repository) Delete(Pipeline *entity.Pipeline) error {
+	return r.db.Delete(Pipeline).Error
 }
 
-func (repository *repository) Migrate() error {
-	return repository.database.AutoMigrate(&entity.Pipeline{})
+func (r *repository) Migrate() error {
+	return r.db.AutoMigrate(&entity.Pipeline{})
 }

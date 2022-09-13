@@ -11,4 +11,4 @@ The Web is a detail.
 The database is a detail.
 We keep these things on the outside where they can do little harm.
 */
-package infrastructure
+package infra

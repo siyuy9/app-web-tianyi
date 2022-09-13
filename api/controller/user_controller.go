@@ -4,28 +4,27 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
-	usecaseUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
+	useSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
+	useUser "gitlab.com/kongrentian-group/tianyi/v1/usecase/user"
 )
 
 type User interface {
-	GetAll(context *fiber.Ctx) error
-	Create(context *fiber.Ctx) error
-	Get(context *fiber.Ctx) error
-	Login(context *fiber.Ctx) error
+	GetAll(ctx *fiber.Ctx) error
+	Create(ctx *fiber.Ctx) error
+	Get(ctx *fiber.Ctx) error
+	Login(ctx *fiber.Ctx) error
 }
 
-type userController struct {
-	interactor        usecaseUser.Interactor
-	sessionInteractor usecaseSession.Interactor
+type user struct {
+	inter   useUser.Interactor
+	session useSession.Interactor
 }
 
 // NewUser: constructor, dependency injection from user service and firebase service
 func NewUser(
-	userInteractor usecaseUser.Interactor,
-	sessionInteractor usecaseSession.Interactor,
+	inter useUser.Interactor, session useSession.Interactor,
 ) User {
-	return &userController{userInteractor, sessionInteractor}
+	return &user{inter, session}
 }
 
 type (
@@ -43,12 +42,12 @@ type (
 // @Success 200 {object} ResponseUsers
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users [GET]
-func (controller *userController) GetAll(context *fiber.Ctx) error {
-	users, err := controller.interactor.GetAll()
+func (c *user) GetAll(ctx *fiber.Ctx) error {
+	users, err := c.inter.GetAll()
 	if err != nil {
 		return presenter.CouldNotFindUser(err)
 	}
-	return presenter.Success(context, users)
+	return presenter.Success(ctx, users)
 }
 
 type UserRequestCreate struct {
@@ -68,9 +67,9 @@ type UserRequestCreate struct {
 // @Success 200 {object} ResponseUser
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users [POST]
-func (controller *userController) Create(context *fiber.Ctx) error {
+func (c *user) Create(ctx *fiber.Ctx) error {
 	request := &UserRequestCreate{}
-	if err := parse(context, request); err != nil {
+	if err := parse(ctx, request); err != nil {
 		return err
 	}
 	user := &entity.User{
@@ -78,10 +77,10 @@ func (controller *userController) Create(context *fiber.Ctx) error {
 		Email:    request.Email,
 		Password: request.Password,
 	}
-	if err := controller.interactor.Create(user); err != nil {
+	if err := c.inter.Create(user); err != nil {
 		return presenter.CouldNotCreateUser(err)
 	}
-	return presenter.Success(context, user)
+	return presenter.Success(ctx, user)
 }
 
 // get a user
@@ -96,16 +95,16 @@ func (controller *userController) Create(context *fiber.Ctx) error {
 // @Success 200 {object} ResponseUser
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users/user/{user_id} [GET]
-func (controller *userController) Get(context *fiber.Ctx) error {
-	id, err := getUserID(context)
+func (c *user) Get(ctx *fiber.Ctx) error {
+	id, err := getUserID(ctx)
 	if err != nil {
 		return err
 	}
-	user, err := controller.interactor.Get(id)
+	user, err := c.inter.Get(id)
 	if err != nil {
 		return presenter.CouldNotFindUser(err)
 	}
-	return presenter.Success(context, user)
+	return presenter.Success(ctx, user)
 }
 
 type UserRequestLogin struct {
@@ -122,16 +121,16 @@ type UserRequestLogin struct {
 // @Success 200 {object} ResponseUser
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/users/login [GET]
-func (controller *userController) Login(context *fiber.Ctx) error {
+func (c *user) Login(ctx *fiber.Ctx) error {
 	request := &UserRequestLogin{}
-	if err := parse(context, request); err != nil {
+	if err := parse(ctx, request); err != nil {
 		return err
 	}
-	user, err := controller.interactor.FindByUsername(request.Username)
+	user, err := c.inter.FindByUsername(request.Username)
 	if err != nil {
 		return presenter.InvalidLoginOrPassword()
 	}
-	matches, err := controller.interactor.PasswordHashCheck(
+	matches, err := c.inter.PasswordHashCheck(
 		user,
 		request.Password,
 	)
@@ -141,16 +140,17 @@ func (controller *userController) Login(context *fiber.Ctx) error {
 	if !matches {
 		return presenter.InvalidLoginOrPassword()
 	}
-	session, err := controller.sessionInteractor.Get(context)
+	session, err := c.session.Get(ctx)
 	if err != nil {
 		return presenter.CouldNotGetSession(err)
 	}
-	context.Cookie(&fiber.Cookie{
-		Name: usecaseSession.SessionCookie, Value: session.ID(),
+	ctx.Cookie(&fiber.Cookie{
+		Name:  useSession.SessionCookie,
+		Value: session.ID(),
 	})
-	session.Set(usecaseSession.UserID, user.ID.String())
+	session.Set(useSession.UserID, user.ID.String())
 	if err := session.Save(); err != nil {
 		return presenter.CouldNotSaveSession(err)
 	}
-	return presenter.Success(context, user)
+	return presenter.Success(ctx, user)
 }

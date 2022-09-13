@@ -7,14 +7,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/storage/redis"
-	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
+	useSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 )
 
 type repository struct {
 	session *session.Store
 }
 
-func New(config *redis.Config) usecaseSession.Repository {
+func New(config *redis.Config) useSession.Repository {
 	return &repository{
 		session: session.New(session.Config{
 			Storage: redis.New(*config),
@@ -22,20 +22,16 @@ func New(config *redis.Config) usecaseSession.Repository {
 	}
 }
 
-func (repository *repository) Get(context interface{}) (
-	usecaseSession.Session, error,
+func (r *repository) Get(context interface{}) (
+	useSession.Session, error,
 ) {
 	contextAsserted, ok := context.(*fiber.Ctx)
 	if !ok {
 		return nil, fmt.Errorf("invalid context type: %v+", context)
 	}
-	return repository.session.Get(contextAsserted)
+	return r.session.Get(contextAsserted)
 }
 
-func (repository *repository) Reset() error {
-	return repository.session.Reset()
-}
+func (r *repository) Reset() error { return r.session.Reset() }
 
-func (repository *repository) Close() error {
-	return repository.session.Storage.Close()
-}
+func (r *repository) Close() error { return r.session.Storage.Close() }

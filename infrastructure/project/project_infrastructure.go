@@ -9,55 +9,50 @@ import (
 )
 
 type repository struct {
-	database *gorm.DB
+	db *gorm.DB
 }
 
-func New(database *gorm.DB) usecaseProject.Repository {
-	return &repository{database: database}
-}
+func New(db *gorm.DB) usecaseProject.Repository { return &repository{db: db} }
 
-func (repository *repository) GetAll() ([]entity.Project, error) {
-	return repository.Find()
-}
+func (r *repository) GetAll() ([]entity.Project, error) { return r.Find() }
 
-func (repository *repository) FindOne(condition *entity.Project) (
+func (r *repository) FindOne(condition *entity.Project) (
 	*entity.Project, error,
 ) {
-	project := &entity.Project{}
-	return project, repository.database.First(&project, condition).Error
+	p := &entity.Project{}
+	return p, r.db.First(&p, condition).Error
 }
 
-func (repository *repository) Get(id uuid.UUID) (*entity.Project, error) {
-	project := &entity.Project{}
-	return project, repository.database.First(&project, id).Error
+func (r *repository) Get(id uuid.UUID) (*entity.Project, error) {
+	p := &entity.Project{}
+	return p, r.db.First(&p, id).Error
 }
 
-func (repository *repository) Find(conditions ...interface{}) (
+func (r *repository) Find(conditions ...interface{}) (
 	[]entity.Project, error,
 ) {
 	projects := make([]entity.Project, 0)
-	err := repository.database.Find(&projects, conditions...).Error
-	return projects, err
+	return projects, r.db.Find(&projects, conditions...).Error
 }
 
-func (repository *repository) Update(project *entity.Project) error {
-	return repository.database.Updates(project).Error
+func (r *repository) Update(project *entity.Project) error {
+	return r.db.Updates(project).Error
 }
 
-func (repository *repository) Create(project *entity.Project) error {
-	return repository.database.Create(project).Error
+func (r *repository) Create(project *entity.Project) error {
+	return r.db.Create(project).Error
 }
 
-func (repository *repository) Save(project *entity.Project) error {
-	return repository.database.Save(project).Error
+func (r *repository) Save(project *entity.Project) error {
+	return r.db.Save(project).Error
 }
 
-func (repository *repository) Delete(project *entity.Project) error {
-	return repository.database.Delete(project).Error
+func (r *repository) Delete(project *entity.Project) error {
+	return r.db.Delete(project).Error
 }
 
-func (repository *repository) Migrate() error {
-	return repository.database.AutoMigrate(
+func (r *repository) Migrate() error {
+	return r.db.AutoMigrate(
 		&entity.Namespace{},
 		&entity.Project{},
 		&entity.Branch{},

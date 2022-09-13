@@ -2,9 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"runtime/debug"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
@@ -12,27 +10,26 @@ import (
 )
 
 // global fiber error handler
-func Error(context *fiber.Ctx, err error) error {
+func Error(ctx *fiber.Ctx, err error) error {
 	// if it is not a custom error for some reason, make it one
 	errNormalized, ok := err.(pkgError.Error)
 	if !ok {
-		errNormalized = pkgError.New(fmt.Errorf(
-			"an unexpected error has occured: %w", err,
-		)).(pkgError.Error)
+		errNormalized = pkgError.New(
+			fmt.Errorf("an unexpected error has occured: %w", err),
+		).(pkgError.Error)
 	}
 
 	// send error response
-	err = presenter.Error(context, errNormalized)
-	if err == nil {
+	errSerialization := presenter.Error(ctx, errNormalized)
+	if errSerialization == nil {
 		return nil
 	}
-	log.Println(context.Route().Path, debug.Stack())
 	// in case a serialization error occurs
 	return presenter.Error(
-		context,
+		ctx,
 		pkgError.NewWithCode(
 			fmt.Errorf(
-				"could not serialize error %#v: %w", errNormalized, err,
+				"could not serialize error %+v: %w", err, errSerialization,
 			),
 			http.StatusInternalServerError,
 		).(pkgError.Error),

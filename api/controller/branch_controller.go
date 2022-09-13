@@ -5,30 +5,26 @@ import (
 
 	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
-	usecaseProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
+	useBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
+	useProject "gitlab.com/kongrentian-group/tianyi/v1/usecase/project"
 )
 
 type Branch interface {
-	Get(context *fiber.Ctx) error
-	GetProjectBranches(context *fiber.Ctx) error
-	Create(context *fiber.Ctx) error
-	Update(context *fiber.Ctx) error
+	Get(ctx *fiber.Ctx) error
+	GetProjectBranches(ctx *fiber.Ctx) error
+	Create(ctx *fiber.Ctx) error
+	Update(ctx *fiber.Ctx) error
 }
 
 type branchController struct {
-	interactor        usecaseBranch.Interactor
-	projectInteractor usecaseProject.Interactor
+	branch  useBranch.Interactor
+	project useProject.Interactor
 }
 
 func NewBranch(
-	branchInteractor usecaseBranch.Interactor,
-	projectInteractor usecaseProject.Interactor,
+	branch useBranch.Interactor, project useProject.Interactor,
 ) Branch {
-	return &branchController{
-		interactor:        branchInteractor,
-		projectInteractor: projectInteractor,
-	}
+	return &branchController{branch: branch, project: project}
 }
 
 type (
@@ -49,20 +45,20 @@ type (
 // @Success 200 {object} ResponseBranch
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id}/branches/{branch_name} [GET]
-func (controller *branchController) Get(context *fiber.Ctx) error {
-	id, err := getProjectID(context)
+func (c *branchController) Get(ctx *fiber.Ctx) error {
+	id, err := getProjectID(ctx)
 	if err != nil {
 		return err
 	}
-	name, err := getBranchName(context)
+	name, err := getBranchName(ctx)
 	if err != nil {
 		return err
 	}
-	branch, err := controller.interactor.GetProjectBranch(id, name)
+	branch, err := c.branch.GetProjectBranch(id, name)
 	if err != nil {
 		return presenter.CouldNotFindProjectBranch(err)
 	}
-	return presenter.Success(context, branch)
+	return presenter.Success(ctx, branch)
 }
 
 // get project branches
@@ -77,18 +73,16 @@ func (controller *branchController) Get(context *fiber.Ctx) error {
 // @Success 200 {object} ResponseBranches
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id}/branches [GET]
-func (controller *branchController) GetProjectBranches(
-	context *fiber.Ctx,
-) error {
-	id, err := getProjectID(context)
+func (c *branchController) GetProjectBranches(ctx *fiber.Ctx) error {
+	id, err := getProjectID(ctx)
 	if err != nil {
 		return err
 	}
-	branches, err := controller.interactor.GetProjectBranches(id)
+	branches, err := c.branch.GetProjectBranches(id)
 	if err != nil {
 		return presenter.CouldNotFindProjectBranch(err)
 	}
-	return presenter.Success(context, branches)
+	return presenter.Success(ctx, branches)
 }
 
 type RequestBranchCreate struct {
@@ -108,20 +102,20 @@ type RequestBranchCreate struct {
 // @Success 200 {object} ResponseBranch
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id}/branches [POST]
-func (controller *branchController) Create(context *fiber.Ctx) error {
-	id, err := getProjectID(context)
+func (c *branchController) Create(ctx *fiber.Ctx) error {
+	id, err := getProjectID(ctx)
 	if err != nil {
 		return err
 	}
 	request := &RequestBranchCreate{}
-	if err = parse(context, request); err != nil {
+	if err = parse(ctx, request); err != nil {
 		return err
 	}
 	branch := &entity.Branch{ProjectID: id, Name: request.Name}
-	if err := controller.interactor.Create(branch); err != nil {
+	if err := c.branch.Create(branch); err != nil {
 		return presenter.CouldNotCreateProjectBranch(err)
 	}
-	return presenter.Success(context, branch)
+	return presenter.Success(ctx, branch)
 }
 
 // update a branch
@@ -137,24 +131,22 @@ func (controller *branchController) Create(context *fiber.Ctx) error {
 // @Success 200 {object} ResponseBranch
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id}/branches/{branch_name} [PUT]
-func (controller *branchController) Update(context *fiber.Ctx) error {
-	id, err := getProjectID(context)
+func (c *branchController) Update(ctx *fiber.Ctx) error {
+	id, err := getProjectID(ctx)
 	if err != nil {
 		return err
 	}
-	branchName, err := getBranchName(context)
+	branchName, err := getBranchName(ctx)
 	if err != nil {
 		return err
 	}
-	project, err := controller.projectInteractor.Get(id)
+	project, err := c.project.Get(id)
 	if err != nil {
 		return presenter.CouldNotFindProject(err)
 	}
-	branch, err := controller.interactor.UpdateBranchFromRemote(
-		project, branchName,
-	)
+	branch, err := c.branch.UpdateBranchFromRemote(project, branchName)
 	if err != nil {
 		return presenter.CouldNotUpdateProject(err)
 	}
-	return presenter.Success(context, branch)
+	return presenter.Success(ctx, branch)
 }

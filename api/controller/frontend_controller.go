@@ -9,27 +9,24 @@ import (
 
 // serve embedded frontend files
 type Frontend interface {
-	Serve(context *fiber.Ctx) error
-	ServeSwagger(context *fiber.Ctx) error
+	Serve(ctx *fiber.Ctx) error
+	ServeSwagger(ctx *fiber.Ctx) error
 }
 
 type frontendController struct {
-	filesystemController func(context *fiber.Ctx) error
-	swaggerController    func(context *fiber.Ctx) error
+	filesystem fiber.Handler
+	swagger    fiber.Handler
 }
 
-func NewFrontend(
-	frontendFilesystem http.FileSystem,
-	swaggerFilesystem http.FileSystem,
-) Frontend {
+func NewFrontend(frontend http.FileSystem, swagger http.FileSystem) Frontend {
 	return &frontendController{
-		filesystemController: filesystem.New(filesystem.Config{
-			Root:         frontendFilesystem,
+		filesystem: filesystem.New(filesystem.Config{
+			Root:         frontend,
 			PathPrefix:   "dist",
 			NotFoundFile: "dist/index.html",
 		}),
-		swaggerController: filesystem.New(filesystem.Config{
-			Root: swaggerFilesystem,
+		swagger: filesystem.New(filesystem.Config{
+			Root: swagger,
 		}),
 	}
 }
@@ -44,10 +41,10 @@ func NewFrontend(
 // @Success 200 {object} map[string]any
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/swagger/swagger.json [PUT]
-func (controller *frontendController) ServeSwagger(context *fiber.Ctx) error {
-	return controller.swaggerController(context)
+func (c *frontendController) ServeSwagger(ctx *fiber.Ctx) error {
+	return c.swagger(ctx)
 }
 
-func (controller *frontendController) Serve(context *fiber.Ctx) error {
-	return controller.filesystemController(context)
+func (c *frontendController) Serve(ctx *fiber.Ctx) error {
+	return c.filesystem(ctx)
 }

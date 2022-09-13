@@ -1,11 +1,10 @@
 package controller
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
-	usecaseJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
-	usecaseSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
+	"gitlab.com/kongrentian-group/tianyi/v1/api/presenter"
+	useJWT "gitlab.com/kongrentian-group/tianyi/v1/usecase/jwt"
+	useSession "gitlab.com/kongrentian-group/tianyi/v1/usecase/session"
 )
 
 var UnauthorizedRoutes = map[string]bool{
@@ -14,48 +13,46 @@ var UnauthorizedRoutes = map[string]bool{
 }
 
 type Session interface {
-	CheckSession(context *fiber.Ctx) error
+	CheckSession(ctx *fiber.Ctx) error
 }
 
-type sessionController struct {
-	interactor    usecaseSession.Interactor
+type session struct {
+	interactor    useSession.Interactor
 	jwtController JWT
-	jwtInteractor usecaseJWT.Interactor
+	jwtInteractor useJWT.Interactor
 }
 
 func NewSession(
-	interactor usecaseSession.Interactor, jwtController JWT,
-	jwtInteractor usecaseJWT.Interactor,
+	inter useSession.Interactor, jwtCtrl JWT, jwt useJWT.Interactor,
 ) Session {
-	return &sessionController{
-		interactor:    interactor,
-		jwtController: jwtController,
-		jwtInteractor: jwtInteractor,
+	return &session{
+		interactor:    inter,
+		jwtController: jwtCtrl,
+		jwtInteractor: jwt,
 	}
 }
 
-func (controller *sessionController) CheckSession(context *fiber.Ctx) error {
+func (c *session) CheckSession(ctx *fiber.Ctx) error {
 	// allow registration and login without a token
-	if _, defined := UnauthorizedRoutes[context.Path()]; defined {
+	if _, defined := UnauthorizedRoutes[ctx.Path()]; defined {
 		return nil
 	}
-	session, err := controller.interactor.Get(context)
+	session, err := c.interactor.Get(ctx)
 	if err != nil {
-		return err
+		return presenter.CouldNotGetSession(err)
 	}
-	log.Println(session.ID(), session.Keys())
 	// if current session contains user_id, the user is logged in
-	if session.Get(usecaseSession.UserID) != nil {
+	if session.Get(useSession.UserID) != nil {
 		return nil
 	}
 	// check if there is a JWT in the header
-	if err := controller.jwtController.CheckJWT(context); err != nil {
+	if err := c.jwtController.CheckJWT(ctx); err != nil {
 		return err
 	}
-	claims, err := controller.jwtInteractor.GetClaims(context.Locals("user"))
+	claims, err := c.jwtInteractor.Claims(ctx.Locals("user"))
 	if err != nil {
 		return err
 	}
-	session.Set(usecaseSession.UserID, claims.ID)
+	session.Set(useSession.UserID, claims.ID)
 	return nil
 }

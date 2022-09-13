@@ -9,54 +9,48 @@ import (
 )
 
 type repository struct {
-	database *gorm.DB
+	db *gorm.DB
 }
 
-func New(database *gorm.DB) usecaseUser.Repository {
-	return &repository{database: database}
+func New(db *gorm.DB) usecaseUser.Repository {
+	return &repository{db: db}
 }
 
-func (repository *repository) GetAll() ([]entity.User, error) {
-	return repository.Find()
-}
+func (r *repository) GetAll() ([]entity.User, error) { return r.Find() }
 
-func (repository *repository) FindOne(
-	condition *entity.User,
-) (*entity.User, error) {
+func (r *repository) FindOne(condition *entity.User) (*entity.User, error) {
 	user := &entity.User{}
-	return user, repository.database.First(&user, condition).Error
+	return user, r.db.First(&user, condition).Error
 }
 
-func (repository *repository) Get(id uuid.UUID) (*entity.User, error) {
+func (r *repository) Get(id uuid.UUID) (*entity.User, error) {
 	user := &entity.User{}
-	return user, repository.database.First(&user, id).Error
+	return user, r.db.First(&user, id).Error
 }
 
-func (repository *repository) Find(
+func (r *repository) Find(
 	conditions ...interface{},
 ) ([]entity.User, error) {
 	users := make([]entity.User, 0)
-	err := repository.database.Find(&users, conditions...).Error
+	err := r.db.Find(&users, conditions...).Error
 	return users, err
 }
 
-func (repository *repository) Save(user *entity.User) error {
-	return repository.database.Save(user).Error
+func (r *repository) Save(user *entity.User) error {
+	return r.db.Save(user).Error
 }
 
-func (repository *repository) Create(user *entity.User) error {
-	return repository.database.Create(user).Error
+func (r *repository) Create(user *entity.User) error {
+	return r.db.Create(user).Error
 }
 
-func (repository *repository) Delete(user *entity.User) error {
-	return repository.database.Delete(user).Error
+func (r *repository) Delete(user *entity.User) error {
+	return r.db.Delete(user).Error
 }
 
-func (repository *repository) Migrate() error {
-	return repository.database.AutoMigrate(
-		&entity.Capability{},
-		&entity.Permission{},
-		&entity.Role{},
-		&entity.User{},
+func (r *repository) Migrate() error {
+	return r.db.AutoMigrate(
+		&entity.Capability{}, &entity.Permission{},
+		&entity.Role{}, &entity.User{},
 	)
 }

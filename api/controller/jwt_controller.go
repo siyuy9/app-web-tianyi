@@ -15,7 +15,7 @@ type JWT interface {
 	// For invalid token, it returns "401 - Unauthorized" error.
 	// For missing token, it returns "400 - Bad Request" error.
 	// https://pkg.go.dev/github.com/gofiber/jwt/v3@v3.2.14#section-readme
-	CheckJWT(context *fiber.Ctx) error
+	CheckJWT(ctx *fiber.Ctx) error
 }
 
 type jwtController struct {
@@ -37,6 +37,6 @@ func NewJWT(secret []byte) JWT {
 	return &jwtController{handler: jwtware.New(config)}
 }
 
-func (controller *jwtController) CheckJWT(context *fiber.Ctx) error {
-	return controller.handler(context)
+func (c *jwtController) CheckJWT(ctx *fiber.Ctx) error {
+	return c.handler(ctx)
 }

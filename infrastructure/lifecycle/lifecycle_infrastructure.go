@@ -69,7 +69,8 @@ func New(configs ...*infraConfig.App) useLifecycle.App {
 	if len(configs) != 0 {
 		app.conf = configs[0]
 	} else {
-		app.conf = infraConfig.New()
+		confCopy := infraConfig.Default
+		app.conf = &confCopy
 	}
 	return app
 }
@@ -160,7 +161,7 @@ func (a *app) SetupConfig() useLifecycle.App {
 }
 
 func (a *app) SetupDatabase() useLifecycle.App {
-	a.db = connectDatabase(a.conf.Database)
+	a.db = connectDatabase(a.conf.DB)
 	return a
 }
 
@@ -219,8 +220,10 @@ func (a *app) SetupController() useLifecycle.App {
 		Lifecycle: controller.NewLifecycle(inter.Lifecycle()),
 		Project:   controller.NewProject(inter.Project()),
 		Branch:    controller.NewBranch(inter.Branch(), inter.Project()),
-		Pipeline:  controller.NewPipeline(inter.Branch(), inter.Project()),
-		JWT:       jwt,
+		Pipeline: controller.NewPipeline(
+			inter.Branch(), inter.Project(), inter.Pipeline(),
+		),
+		JWT: jwt,
 	}
 	if err := pkg.ValidateStruct(a.ctrl); err != nil {
 		log.Panicln(err)

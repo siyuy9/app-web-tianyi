@@ -17,14 +17,45 @@ import (
 // you need to use `mapstructure`
 // https://github.com/spf13/viper/issues/125
 type App struct {
-	Server   *Server       `mapstructure:"server"`
-	Database *Database     `mapstructure:"database"`
-	Redis    *redis.Config `mapstructure:"redis"`
-	Fiber    *fiber.Config `mapstructure:"fiber"`
+	Server *Server       `mapstructure:"server"`
+	DB     *DB           `mapstructure:"database"`
+	Redis  *redis.Config `mapstructure:"redis"`
+	Fiber  *fiber.Config `mapstructure:"fiber"`
 	// have to keep it here, otherwise viper.UnmarshalExact will throw an error
 	// because there is s CLI flag 'config', but the struct does not have a
 	// corresponding field
-	ConfigPath string `mapstructure:"config"`
+	Path string `mapstructure:"config"`
+}
+
+var Default = App{
+	Server: &Server{
+		Host:         "127.0.0.1",
+		Port:         "8080",
+		RequestLimit: 100,
+		JWT: &JWT{
+			Secret:     "",
+			Expiration: 72,
+		},
+	},
+	DB: &DB{
+		Type: DBTypePostgresql,
+		Conn: map[string]string{
+			"host":     "127.0.0.1",
+			"port":     "9920",
+			"user":     "admin",
+			"password": "admin",
+			"dbname":   "tianyi",
+			"sslmode":  "disable",
+		},
+	},
+	Redis: &redis.Config{
+		Host:     "127.0.0.1",
+		Port:     6379,
+		Password: "admin",
+		Database: 0,
+		Reset:    false,
+	},
+	Fiber: &fiber.Config{},
 }
 
 type Server struct {
@@ -46,72 +77,21 @@ type JWT struct {
 }
 
 // jwt middleware requires an array of bytes
-func (configJWT *JWT) GetSecret() []byte {
-	return []byte(configJWT.Secret)
-}
+func (c *JWT) GetSecret() []byte { return []byte(c.Secret) }
 
-type Database struct {
+type DB struct {
 	// https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL
-	Connection map[string]string `mapstructure:"connection"`
-	Type       DatabaseType      `mapstructure:"type"`
+	Conn map[string]string `mapstructure:"connection"`
+	Type DBType            `mapstructure:"type"`
 }
 
-type DatabaseType string
+type DBType string
 
-const DatabaseTypePostgresql = "postgresql"
-
-func NewServer() *Server {
-	return &Server{
-		Host:         "127.0.0.1",
-		Port:         "8080",
-		RequestLimit: 100,
-		JWT:          NewJWT(),
-	}
-}
-
-func NewJWT() *JWT {
-	return &JWT{
-		Secret:     "",
-		Expiration: 72,
-	}
-}
-
-func NewDatabase() *Database {
-	return &Database{
-		Type: DatabaseTypePostgresql,
-		Connection: map[string]string{
-			"host":     "127.0.0.1",
-			"port":     "9920",
-			"user":     "admin",
-			"password": "admin",
-			"dbname":   "tianyi",
-			"sslmode":  "disable",
-		},
-	}
-}
-
-func NewRedis() *redis.Config {
-	return &redis.Config{
-		Host:     "127.0.0.1",
-		Port:     6379,
-		Password: "admin",
-		Database: 0,
-		Reset:    false,
-	}
-}
-
-func New() *App {
-	return &App{
-		Server:   NewServer(),
-		Database: NewDatabase(),
-		Redis:    NewRedis(),
-		Fiber:    &fiber.Config{},
-	}
-}
+const DBTypePostgresql = "postgresql"
 
 // populate the config file using command line, environment, and a set of
 // predefined paths
-func (app *App) Populate() *App {
+func (a *App) Populate() *App {
 	// enable automatic load of environment variables that match
 	// e.g., TIANYI_CONFIG for '--config' flag
 	viper.SetEnvPrefix("tianyi")
@@ -146,7 +126,7 @@ func (app *App) Populate() *App {
 		log.Fatalf("could not read config file: %v", err)
 	}
 	configPath := viper.ConfigFileUsed()
-	if err := viper.UnmarshalExact(app); err != nil {
+	if err := viper.UnmarshalExact(a); err != nil {
 		log.Fatalf(
 			"could not unmarshal config file '%s': %v",
 			configPath,
@@ -154,5 +134,5 @@ func (app *App) Populate() *App {
 		)
 	}
 	log.Println("Using config file:", configPath)
-	return app
+	return a
 }

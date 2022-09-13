@@ -1,4 +1,4 @@
-package infrastructure
+package infra
 
 import (
 	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"

@@ -1,62 +1,55 @@
-package infraJob
+package infra
 
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseJob "gitlab.com/kongrentian-group/tianyi/v1/usecase/job"
+	useJob "gitlab.com/kongrentian-group/tianyi/v1/usecase/job"
 )
 
 type repository struct {
-	database *gorm.DB
+	db *gorm.DB
 }
 
-func New(database *gorm.DB) usecaseJob.Repository {
-	return &repository{database: database}
+func New(db *gorm.DB) useJob.Repository {
+	return &repository{db: db}
 }
 
-func (repository *repository) GetAll() ([]entity.Job, error) {
-	return repository.Find()
+func (r *repository) GetAll() ([]entity.Job, error) { return r.Find() }
+
+func (r *repository) FindOne(condition *entity.Job) (*entity.Job, error) {
+	j := &entity.Job{}
+	return j, r.db.First(&j, condition).Error
 }
 
-func (repository *repository) FindOne(
-	condition *entity.Job,
-) (*entity.Job, error) {
-	job := &entity.Job{}
-	return job, repository.database.First(&job, condition).Error
+func (r *repository) Get(id uuid.UUID) (*entity.Job, error) {
+	j := &entity.Job{}
+	return j, r.db.First(&j, id).Error
 }
 
-func (repository *repository) Get(id uuid.UUID) (*entity.Job, error) {
-	job := &entity.Job{}
-	return job, repository.database.First(&job, id).Error
+func (r *repository) GetByRedisID(id string) (*entity.Job, error) {
+	j := &entity.Job{}
+	return j, r.db.First(&j, &entity.Job{RedisJobID: id}).Error
 }
 
-func (repository *repository) GetByRedisID(id string) (*entity.Job, error) {
-	job := &entity.Job{}
-	err := repository.database.First(&job, &entity.Job{RedisJobID: id}).Error
-	return job, err
-}
-
-func (repository *repository) Find(
-	conditions ...interface{},
-) ([]entity.Job, error) {
+func (r *repository) Find(conditions ...interface{}) ([]entity.Job, error) {
 	jobs := make([]entity.Job, 0)
-	return jobs, repository.database.Find(&jobs, conditions...).Error
+	return jobs, r.db.Find(&jobs, conditions...).Error
 }
 
-func (repository *repository) Save(job *entity.Job) error {
-	return repository.database.Save(job).Error
+func (r *repository) Save(job *entity.Job) error {
+	return r.db.Save(job).Error
 }
 
-func (repository *repository) Create(job *entity.Job) error {
-	return repository.database.Create(job).Error
+func (r *repository) Create(job *entity.Job) error {
+	return r.db.Create(job).Error
 }
 
-func (repository *repository) Delete(job *entity.Job) error {
-	return repository.database.Delete(job).Error
+func (r *repository) Delete(job *entity.Job) error {
+	return r.db.Delete(job).Error
 }
 
-func (repository *repository) Migrate() error {
-	return repository.database.AutoMigrate(&entity.Job{})
+func (r *repository) Migrate() error {
+	return r.db.AutoMigrate(&entity.Job{})
 }

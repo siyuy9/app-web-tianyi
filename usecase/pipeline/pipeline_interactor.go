@@ -9,24 +9,22 @@ import (
 	usecaseJob "gitlab.com/kongrentian-group/tianyi/v1/usecase/job"
 )
 
-type interactor struct {
-	repository    Repository
-	jobInteractor usecaseJob.Interactor
+type pipeline struct {
+	repository Repository
+	job        usecaseJob.Interactor
 }
 
-func New(
-	repository Repository, jobInteractor usecaseJob.Interactor,
-) Interactor {
-	return &interactor{repository, jobInteractor}
+func New(repository Repository, job usecaseJob.Interactor) Interactor {
+	return &pipeline{repository, job}
 }
 
-func (interactor *interactor) Create(
+func (p *pipeline) Create(
 	pipeline *entity.PipelineConfigPipeline,
 ) *entity.Pipeline {
 	return nil
 }
 
-func (interactor *interactor) RunJob(job *entity.Job) error {
+func (p *pipeline) RunJob(job *entity.Job) error {
 	request, err := http.NewRequest(
 		job.Config.RequestType, job.Config.URL, nil,
 	)
@@ -44,13 +42,19 @@ func (interactor *interactor) RunJob(job *entity.Job) error {
 	}
 	defer response.Body.Close()
 	var responseMap map[string]interface{}
-	if json.NewDecoder(response.Body).Decode(&responseMap); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&responseMap); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (interactor *interactor) JobErrorHandler(
+func (p *pipeline) SchedulePipelines(branch *entity.Branch) (
+	[]entity.Pipeline, error,
+) {
+	return nil, nil
+}
+
+func (p *pipeline) JobErrorHandler(
 	job *entity.Job, err error,
 ) error {
 	if err == nil {
@@ -59,9 +63,9 @@ func (interactor *interactor) JobErrorHandler(
 	job.Log += fmt.Sprintf("an error has occured:\n%+v", err)
 	job.Result = false
 	job.Status = entity.JobError
-	return interactor.jobInteractor.Repository().Save(job)
+	return p.job.Repository().Save(job)
 }
 
-func (interactor *interactor) Repository() Repository {
-	return interactor.repository
+func (p *pipeline) Repository() Repository {
+	return p.repository
 }

@@ -24,16 +24,16 @@ var SuccessModelDefault = &Response[SuccessModel]{
 	Data: SuccessModel{Status: "success"},
 }
 
-func Success(context *fiber.Ctx, response any, code ...int) error {
+func Success(ctx *fiber.Ctx, response any, code ...int) error {
 	status := http.StatusOK
 	if len(code) != 0 {
 		status = code[0]
 	}
-	return context.Status(status).JSON(&Response[any]{Data: response})
+	return ctx.Status(status).JSON(&Response[any]{Data: response})
 }
 
-func SuccessDefault(context *fiber.Ctx, code ...int) error {
-	return Success(context, SuccessModelDefault, code...)
+func SuccessDefault(ctx *fiber.Ctx, code ...int) error {
+	return Success(ctx, SuccessModelDefault, code...)
 }
 
 func InvalidRequestBodyFormat(err error) error {
@@ -50,11 +50,11 @@ func InvalidRequestBodyContent(err error) error {
 	)
 }
 
-func RouteDoesNotExist(context *fiber.Ctx) error {
+func RouteDoesNotExist(ctx *fiber.Ctx) error {
 	return pkgError.NewWithCode(
 		fmt.Errorf(
 			"route '%s %s' does not exist",
-			context.Method(), context.OriginalURL(),
+			ctx.Method(), ctx.OriginalURL(),
 		),
 		http.StatusNotFound,
 	)

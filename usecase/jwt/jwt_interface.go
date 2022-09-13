@@ -6,5 +6,5 @@ type Interactor interface {
 	// generate user jwt
 	New(user *entity.User) (string, error)
 	// get claims from jwt
-	GetClaims(token interface{}) (*entity.JWTClaims, error)
+	Claims(token interface{}) (*entity.JWTClaims, error)
 }

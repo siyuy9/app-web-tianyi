@@ -12,6 +12,7 @@ const (
 type Interactor interface {
 	Repository() Repository
 	RunJob(job *entity.Job) error
+	SchedulePipelines(branch *entity.Branch) ([]entity.Pipeline, error)
 	JobErrorHandler(job *entity.Job, err error) error
 }
 

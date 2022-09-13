@@ -6,22 +6,22 @@ import (
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
 	infraConfig "gitlab.com/kongrentian-group/tianyi/v1/infrastructure/config"
-	usecaseJob "gitlab.com/kongrentian-group/tianyi/v1/usecase/job"
-	usecasePool "gitlab.com/kongrentian-group/tianyi/v1/usecase/pool"
+	useJob "gitlab.com/kongrentian-group/tianyi/v1/usecase/job"
+	usePool "gitlab.com/kongrentian-group/tianyi/v1/usecase/pool"
 )
 
 type pool struct {
-	workerPool    *work.WorkerPool
-	redisPool     *redis.Pool
-	enqueuer      *work.Enqueuer
-	jobRepository usecaseJob.Repository
+	workerPool *work.WorkerPool
+	redisPool  *redis.Pool
+	enqueuer   *work.Enqueuer
+	jobRepo    useJob.Repository
 }
 
 type workJob func(*work.Job) error
 
 func New(
-	config *infraConfig.App, jobRepository usecaseJob.Repository,
-) usecasePool.Pool {
+	config *infraConfig.App, jobRepository useJob.Repository,
+) usePool.Pool {
 	redisPool := &redis.Pool{
 		MaxActive: 15,
 		MaxIdle:   15,
@@ -39,30 +39,27 @@ func New(
 	return &pool{workerPool, redisPool, enqueuer, jobRepository}
 }
 
-func (pool *pool) Start() {
-	pool.workerPool.Start()
+func (p *pool) Start() { p.workerPool.Start() }
+
+func (p *pool) Close() error {
+	p.workerPool.Stop()
+	return p.redisPool.Close()
 }
 
-func (pool *pool) Close() error {
-	pool.workerPool.Stop()
-	return pool.redisPool.Close()
-}
-
-func (pool *pool) Job(
-	name string, handler usecasePool.Handler,
-	errorHandler usecasePool.ErrorHandler,
+func (p *pool) Job(
+	name string, handler usePool.Handler, errorHandler usePool.ErrorHandler,
 ) {
-	pool.workerPool.JobWithOptions(
+	p.workerPool.JobWithOptions(
 		name, work.JobOptions{MaxFails: 1},
-		pool.normalizeHandler(handler, errorHandler),
+		p.normalizeHandler(handler, errorHandler),
 	)
 }
 
-func (pool *pool) normalizeHandler(
-	handler usecasePool.Handler, errorHandler usecasePool.ErrorHandler,
+func (p *pool) normalizeHandler(
+	handler usePool.Handler, errorHandler usePool.ErrorHandler,
 ) workJob {
 	return func(jobRedis *work.Job) error {
-		job, err := pool.jobRepository.GetByRedisID(jobRedis.ID)
+		job, err := p.jobRepo.GetByRedisID(jobRedis.ID)
 		if err != nil {
 			return fmt.Errorf(
 				"could not get the job from the database: %w", err,

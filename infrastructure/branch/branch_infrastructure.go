@@ -1,4 +1,4 @@
-package infraBranch
+package infra
 
 import (
 	"io"
@@ -12,62 +12,61 @@ import (
 	"gorm.io/gorm"
 
 	"gitlab.com/kongrentian-group/tianyi/v1/entity"
-	usecaseBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
+	useBranch "gitlab.com/kongrentian-group/tianyi/v1/usecase/branch"
 )
 
 type repository struct {
-	database *gorm.DB
+	db *gorm.DB
 }
 
-func New(database *gorm.DB) usecaseBranch.Repository {
-	return &repository{database: database}
+func New(db *gorm.DB) useBranch.Repository {
+	return &repository{db: db}
 }
 
-func (repository *repository) GetAll() ([]entity.Branch, error) {
-	return repository.Find()
+func (r *repository) GetAll() ([]entity.Branch, error) {
+	return r.Find()
 }
 
-func (repository *repository) FindOne(condition *entity.Branch) (
+func (r *repository) FindOne(condition *entity.Branch) (
 	*entity.Branch, error,
 ) {
 	branch := &entity.Branch{}
-	return branch, repository.database.Limit(1).Find(&branch, condition).Error
+	return branch, r.db.Limit(1).Find(&branch, condition).Error
 }
 
-func (repository *repository) Get(id uuid.UUID) (*entity.Branch, error) {
+func (r *repository) Get(id uuid.UUID) (*entity.Branch, error) {
 	branch := &entity.Branch{}
-	return branch, repository.database.First(&branch, id).Error
+	return branch, r.db.First(&branch, id).Error
 }
 
-func (repository *repository) Find(conditions ...interface{}) (
+func (r *repository) Find(conditions ...interface{}) (
 	[]entity.Branch, error,
 ) {
-	branchs := make([]entity.Branch, 0)
-	err := repository.database.Find(&branchs, conditions...).Error
-	return branchs, err
+	branches := make([]entity.Branch, 0)
+	return branches, r.db.Find(&branches, conditions...).Error
 }
 
-func (repository *repository) Update(branch *entity.Branch) error {
-	return repository.database.Updates(branch).Error
+func (r *repository) Update(branch *entity.Branch) error {
+	return r.db.Updates(branch).Error
 }
 
-func (repository *repository) Save(branch *entity.Branch) error {
-	return repository.database.Save(branch).Error
+func (r *repository) Save(branch *entity.Branch) error {
+	return r.db.Save(branch).Error
 }
 
-func (repository *repository) Create(branch *entity.Branch) error {
-	return repository.database.Create(branch).Error
+func (r *repository) Create(branch *entity.Branch) error {
+	return r.db.Create(branch).Error
 }
 
-func (repository *repository) Delete(branch *entity.Branch) error {
-	return repository.database.Delete(branch).Error
+func (r *repository) Delete(branch *entity.Branch) error {
+	return r.db.Delete(branch).Error
 }
 
-func (repository *repository) Migrate() error {
-	return repository.database.AutoMigrate(&entity.Branch{})
+func (r *repository) Migrate() error {
+	return r.db.AutoMigrate(&entity.Branch{})
 }
 
-func (repository *repository) GetRemotePipelineConfig(
+func (r *repository) GetRemotePipelineConfig(
 	source string, branch string, filePath string,
 ) (config *entity.PipelineConfig, err error) {
 	filesystem := memfs.New()

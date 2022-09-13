@@ -9,10 +9,10 @@ import (
 )
 
 type Project interface {
-	GetByID(context *fiber.Ctx) error
-	Get(context *fiber.Ctx) error
-	Create(context *fiber.Ctx) error
-	Update(context *fiber.Ctx) error
+	GetByID(ctx *fiber.Ctx) error
+	Get(ctx *fiber.Ctx) error
+	Create(ctx *fiber.Ctx) error
+	Update(ctx *fiber.Ctx) error
 }
 
 type (
@@ -20,14 +20,12 @@ type (
 	ResponseProjects = presenter.Response[[]entity.Project]
 )
 
-type projectController struct {
-	interactor usecaseProject.Interactor
+type project struct {
+	inter usecaseProject.Interactor
 }
 
-func NewProject(
-	projectInteractor usecaseProject.Interactor,
-) Project {
-	return &projectController{interactor: projectInteractor}
+func NewProject(inter usecaseProject.Interactor) Project {
+	return &project{inter}
 }
 
 // get a project
@@ -42,16 +40,16 @@ func NewProject(
 // @Success 200 {object} ResponseProject
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id} [GET]
-func (controller *projectController) GetByID(context *fiber.Ctx) error {
-	id, err := getProjectID(context)
+func (c *project) GetByID(ctx *fiber.Ctx) error {
+	id, err := getProjectID(ctx)
 	if err != nil {
 		return err
 	}
-	project, err := controller.interactor.Get(id)
+	project, err := c.inter.Get(id)
 	if err != nil {
 		return presenter.CouldNotFindProject(err)
 	}
-	return presenter.Success(context, project)
+	return presenter.Success(ctx, project)
 }
 
 // get projects
@@ -66,20 +64,20 @@ func (controller *projectController) GetByID(context *fiber.Ctx) error {
 // @Success 200 {object} ResponseProjects
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects [GET]
-func (controller *projectController) Get(context *fiber.Ctx) error {
-	path := context.Query("path")
+func (c *project) Get(ctx *fiber.Ctx) error {
+	path := ctx.Query("path")
 	if path == "" {
-		projects, err := controller.interactor.GetAll()
+		projects, err := c.inter.GetAll()
 		if err != nil {
 			return presenter.CouldNotFindProject(err)
 		}
-		return presenter.Success(context, projects)
+		return presenter.Success(ctx, projects)
 	}
-	project, err := controller.interactor.GetByPath(path)
+	project, err := c.inter.GetByPath(path)
 	if err != nil {
 		return presenter.CouldNotFindProject(err)
 	}
-	return presenter.Success(context, []entity.Project{*project})
+	return presenter.Success(ctx, []entity.Project{*project})
 }
 
 type ProjectRequestCreate struct {
@@ -100,9 +98,9 @@ type ProjectRequestCreate struct {
 // @Success 200 {object} ResponseProject
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects [POST]
-func (controller *projectController) Create(context *fiber.Ctx) error {
+func (c *project) Create(ctx *fiber.Ctx) error {
 	request := &ProjectRequestCreate{}
-	if err := parse(context, request); err != nil {
+	if err := parse(ctx, request); err != nil {
 		return err
 	}
 	project := &entity.Project{
@@ -110,10 +108,10 @@ func (controller *projectController) Create(context *fiber.Ctx) error {
 		Source:        request.Source,
 		DefaultBranch: request.DefaultBranch,
 	}
-	if err := controller.interactor.Create(project); err != nil {
+	if err := c.inter.Create(project); err != nil {
 		return presenter.CouldNotCreateProject(err)
 	}
-	return presenter.Success(context, project)
+	return presenter.Success(ctx, project)
 }
 
 // update a project
@@ -129,18 +127,18 @@ func (controller *projectController) Create(context *fiber.Ctx) error {
 // @Success 200 {object} ResponseProject
 // @Failure 500 {object} presenter.ResponseError
 // @Router /api/v1/projects/{project_id} [PUT]
-func (controller *projectController) Update(context *fiber.Ctx) error {
-	id, err := getProjectID(context)
+func (c *project) Update(ctx *fiber.Ctx) error {
+	id, err := getProjectID(ctx)
 	if err != nil {
 		return err
 	}
 	project := &entity.Project{}
-	if err = parse(context, project); err != nil {
+	if err = parse(ctx, project); err != nil {
 		return err
 	}
 	project.ID = id
-	if err = controller.interactor.Update(project); err != nil {
+	if err = c.inter.Update(project); err != nil {
 		return presenter.CouldNotUpdateProject(err)
 	}
-	return presenter.Success(context, project)
+	return presenter.Success(ctx, project)
 }
