@@ -1,6 +1,6 @@
 # description
 
-boring CI/CD tool
+SPA CI/CD app
 
 # status
 
