@@ -1,6 +1,19 @@
-# `天意`
+# description
 
-## architecture
+boring CI/CD tool
+
+# status
+
+abandoned
+
+there are too many great OSS CI/CD tools out there to make another,
+especially if there is nothing original in this one
+
+## overview
+
+![overview](./docs/diagrams/app-web-tianyi.svg)
+
+## structure
 
 clean architecture
 ![image](https://blog.cleancoder.com/uncle-bob/images/2012-08-13-the-clean-architecture/CleanArchitecture.jpg)
@@ -11,37 +24,47 @@ tianyi
 │   ├── controller
 │   ├── middleware
 │   └── presenter
-├── docs (OpenAPI Specification)
+├── cmd (CLI interface)
+├── docs (OpenAPI Specification and other documentation)
+│   └── diagrams
 ├── entity [Enterprise Business Rules]
 ├── infrastructure [Frameworks and Drivers]
 │   ├── access
-│   ├── app
+│   ├── branch
 │   ├── config
+│   ├── job
 │   ├── jwt
+│   ├── lifecycle
+│   ├── pipeline
+│   ├── pool
 │   ├── project
-│   │   └── branch
-│   ├── ui
-│   │   ├── cli
-│   │   └── web2
+│   ├── schedule
+│   ├── session
 │   └── user
 ├── pkg (Support packages)
+│   └── error
 └── usecase [Application Business Rules]
-    ├── access
-    ├── app
-    ├── jwt
-    ├── lifecycle
-    ├── project
-    │   └── branch
-    └── user
+│   ├── access
+│   ├── branch
+│   ├── job
+│   ├── jwt
+│   ├── lifecycle
+│   ├── pipeline
+│   ├── pool
+│   ├── project
+│   ├── schedule
+│   ├── session
+│   └── user
+└── web (Web interface)
 ```
 
 ## logo
 
-![black logo](./infrastructure/ui/web2/public/images/logo-dark.svg)
+![black logo](./web/public/images/logo-dark.svg)
 
-![white logo](./infrastructure/ui/web2/public/images/logo-white.svg)
+![white logo](./web/public/images/logo-white.svg)
 
-it is made with [`google-font-to-svg-path`](https://danmarshall.github.io/google-font-to-svg-path/)
+they are made with [`google-font-to-svg-path`](https://danmarshall.github.io/google-font-to-svg-path/)
 using font
 [`zen-maru-gothic`](https://fonts.adobe.com/fonts/zen-maru-gothic#licensing-section)
 
