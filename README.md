@@ -11,7 +11,7 @@ especially if there is nothing original in this one
 
 ## overview
 
-![overview](./docs/diagrams/app-web-tianyi.svg)
+![overview](./docs/diagrams/app-web-tianyi.drawio.svg)
 
 ## structure
 
